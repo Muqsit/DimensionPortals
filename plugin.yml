@@ -1,4 +1,4 @@
 name: NetherPortal
 main: muqsit\netherportal\Loader
 api: 4.0.0
-version: 0.0.01
+version: 0.0.1
