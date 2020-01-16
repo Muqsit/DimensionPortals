@@ -8,6 +8,11 @@ use pocketmine\block\Block;
 use pocketmine\item\Item;
 use pocketmine\player\Player;
 
+/**
+ * The fuck is an exo block?
+ * (Not really a) wrapper around Block that handles
+ * block events.
+ */
 interface ExoBlock{
 
 	/**
