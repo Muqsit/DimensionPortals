@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace muqsit\netherportal\exoblock;
 
 use Ds\Queue;
+use muqsit\netherportal\player\PlayerManager;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockLegacyIds;
@@ -18,7 +19,7 @@ use pocketmine\world\World;
 
 class PortalExoBlock implements ExoBlock{
 
-	public function onUpdate(Block $wrapping) : bool{
+	public function update(Block $wrapping) : bool{
 		$pos = $wrapping->getPos();
 
 		/** @var World $world */
@@ -49,8 +50,16 @@ class PortalExoBlock implements ExoBlock{
 		return false;
 	}
 
-	public function onInteract(Block $wrapping, Player $player, Item $item, int $face) : bool{
+	public function interact(Block $wrapping, Player $player, Item $item, int $face) : bool{
 		return false;
+	}
+
+	public function onPlayerMoveInside(Player $player) : void{
+		PlayerManager::get($player)->onEnterPortal();
+	}
+
+	public function onPlayerMoveOutside(Player $player) : void{
+		PlayerManager::get($player)->onLeavePortal();
 	}
 
 	public function isValid(Block $block) : bool{

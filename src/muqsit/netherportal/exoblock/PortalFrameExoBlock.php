@@ -21,7 +21,7 @@ class PortalFrameExoBlock implements ExoBlock{
 		$this->lengthSquared = (new Vector2($max_portal_height, $max_portal_width))->lengthSquared();
 	}
 
-	public function onInteract(Block $wrapping, Player $player, Item $item, int $face) : bool{
+	public function interact(Block $wrapping, Player $player, Item $item, int $face) : bool{
 		if($item->getId() === ItemIds::FLINT_AND_STEEL){
 			$affectedBlock = $wrapping->getSide($face);
 			if($affectedBlock->getId() === BlockLegacyIds::AIR){
@@ -47,8 +47,14 @@ class PortalFrameExoBlock implements ExoBlock{
 		return false;
 	}
 
-	public function onUpdate(Block $wrapping) : bool{
+	public function update(Block $wrapping) : bool{
 		return false;
+	}
+
+	public function onPlayerMoveInside(Player $player) : void{
+	}
+
+	public function onPlayerMoveOutside(Player $player) : void{
 	}
 
 	public function fill(World $world, Vector3 $origin, int $radius, int $direction) : array{

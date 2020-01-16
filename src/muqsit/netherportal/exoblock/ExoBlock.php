@@ -17,11 +17,21 @@ interface ExoBlock{
 	 * @param int $face
 	 * @return bool
 	 */
-	public function onInteract(Block $wrapping, Player $player, Item $item, int $face) : bool;
+	public function interact(Block $wrapping, Player $player, Item $item, int $face) : bool;
 
 	/**
 	 * @param Block $wrapping
 	 * @@return bool
 	 */
-	public function onUpdate(Block $wrapping) : bool;
+	public function update(Block $wrapping) : bool;
+
+	/**
+	 * @param Player $player
+	 */
+	public function onPlayerMoveInside(Player $player) : void;
+
+	/**
+	 * @param Player $player
+	 */
+	public function onPlayerMoveOutside(Player $player) : void;
 }

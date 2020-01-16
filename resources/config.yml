@@ -6,3 +6,13 @@ max-portal-height: 30
 
 # Frame block surrounding the portal
 portal-frame-block: OBSIDIAN
+
+# The number of ticks the player must be in portal
+# before they get teleported to the nether.
+teleportation-wait-period: 80
+
+# Configure the worlds folder to use for overworld
+# and nether.
+worlds:
+  overworld: world
+  nether: nether
