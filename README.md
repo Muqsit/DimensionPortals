@@ -1,10 +1,10 @@
 # NetherPortal
-Port of [MiNET](https://github.com/NiclasOlofsson/MiNET)'s nether portal generator for PocketMine-MP.
+Nether portal creation and destruction was ported from [MiNET](https://github.com/NiclasOlofsson/MiNET).
 
-### What this plugin does
-- Lets players create nether portals
-- Lets players destroy nether portals
-- Lets players teleport from one dimension to another using nether portals
+### What does this plugin do
+- Let players create nether portals
+- Let players destroy nether portals
+- Let players teleport from one dimension to another using nether portals
 
-### What this plugin does NOT do
-- Generates nether terrain
+### What does this plugin NOT do
+- Generate nether terrain
