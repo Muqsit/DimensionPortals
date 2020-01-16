@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace muqsit\netherportal\exoblock;
 
+use InvalidArgumentException;
 use muqsit\netherportal\Loader;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\VanillaBlocks;
 
 final class ExoBlockFactory{
+
+	/** @var int */
+	public static $FRAME_BLOCK_ID;
 
 	/** @var ExoBlock[] */
 	private static $blocks = [];
@@ -17,7 +22,15 @@ final class ExoBlockFactory{
 	public static function init(Loader $loader) : void{
 		$loader->getServer()->getPluginManager()->registerEvents(new ExoBlockEventHandler(), $loader);
 
-		self::register(new ObsidianExoBlock(30, 30), VanillaBlocks::OBSIDIAN());
+		$config = $loader->getConfig();
+		$frame_block = VanillaBlocks::fromString((string) $config->get("portal-frame-block"));
+		if($frame_block->getId() === BlockLegacyIds::AIR){
+			throw new InvalidArgumentException("Invalid nether portal frame block " . $config->get("portal-frame-block"));
+		}
+
+		self::$FRAME_BLOCK_ID = $frame_block->getId();
+
+		self::register(new PortalFrameExoBlock((int) $config->get("max-portal-height"), (int) $config->get("max-portal-width")), $frame_block);
 		self::register(new PortalExoBlock(), VanillaBlocks::NETHER_PORTAL());
 	}
 

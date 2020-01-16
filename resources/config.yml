@@ -1,0 +1,8 @@
+# NetherPortal v0.0.1
+
+# Portal dimensions cap
+max-portal-width: 30
+max-portal-height: 30
+
+# Frame block surrounding the portal
+portal-frame-block: OBSIDIAN

@@ -12,7 +12,7 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector2;use pocketmine\math\Vector3;use pocketmine\player\Player;
 use pocketmine\world\World;
 
-class ObsidianExoBlock implements ExoBlock{
+class PortalFrameExoBlock implements ExoBlock{
 
 	/** @var int */
 	private $lengthSquared;
@@ -104,7 +104,7 @@ class ObsidianExoBlock implements ExoBlock{
 	}
 
 	private function isValid(Block $block, Vector3 $coordinates, array $portals) : bool{
-		return $block->getId() === BlockLegacyIds::OBSIDIAN ||
+		return $block->getId() === ExoBlockFactory::$FRAME_BLOCK_ID ||
 			ArrayUtils::firstOrDefault(
 				$portals,
 				static function(int $hash, Block $b) use($coordinates) : bool{

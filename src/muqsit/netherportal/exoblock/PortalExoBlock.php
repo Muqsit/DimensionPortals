@@ -55,7 +55,7 @@ class PortalExoBlock implements ExoBlock{
 
 	public function isValid(Block $block) : bool{
 		$blockId = $block->getId();
-		return $blockId === BlockLegacyIds::OBSIDIAN || $blockId === BlockLegacyIds::PORTAL;
+		return $blockId === ExoBlockFactory::$FRAME_BLOCK_ID || $blockId === BlockLegacyIds::PORTAL;
 	}
 
 	public function fill(World $world, Vector3 $origin, int $metadata) : void{
