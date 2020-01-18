@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace muqsit\netherportal\world;
+namespace muqsit\dimensionportals\world;
 
 use pocketmine\utils\Utils;
 use pocketmine\world\World;

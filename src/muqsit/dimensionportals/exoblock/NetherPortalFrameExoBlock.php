@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
-namespace muqsit\netherportal\exoblock;
+namespace muqsit\dimensionportals\exoblock;
 
-use Ds\Queue;use muqsit\netherportal\utils\ArrayUtils;use pocketmine\block\Block;
+use Ds\Queue;
+use muqsit\dimensionportals\utils\ArrayUtils;
+use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;use pocketmine\block\BlockLegacyIds;
 use pocketmine\item\Item;
 use pocketmine\item\ItemIds;
@@ -12,12 +14,16 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector2;use pocketmine\math\Vector3;use pocketmine\player\Player;
 use pocketmine\world\World;
 
-class PortalFrameExoBlock implements ExoBlock{
+class NetherPortalFrameExoBlock implements ExoBlock{
+
+	/** @var int */
+	private $frame_block_id;
 
 	/** @var int */
 	private $lengthSquared;
 
-	public function __construct(int $max_portal_height, int $max_portal_width){
+	public function __construct(Block $frame_block, int $max_portal_height, int $max_portal_width){
+		$this->frame_block_id = $frame_block;
 		$this->lengthSquared = (new Vector2($max_portal_height, $max_portal_width))->lengthSquared();
 	}
 
@@ -110,7 +116,7 @@ class PortalFrameExoBlock implements ExoBlock{
 	}
 
 	private function isValid(Block $block, Vector3 $coordinates, array $portals) : bool{
-		return $block->getId() === ExoBlockFactory::$FRAME_BLOCK_ID ||
+		return $block->getId() === $this->frame_block_id ||
 			ArrayUtils::firstOrDefault(
 				$portals,
 				static function(int $hash, Block $b) use($coordinates) : bool{

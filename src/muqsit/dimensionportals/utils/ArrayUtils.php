@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace muqsit\netherportal\utils;
+namespace muqsit\dimensionportals\utils;
 
 use Closure;
 

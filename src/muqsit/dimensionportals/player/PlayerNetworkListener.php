@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace muqsit\netherportal\player;
+namespace muqsit\dimensionportals\player;
 
-use muqsit\netherportal\world\WorldManager;
+use muqsit\dimensionportals\world\WorldManager;
 use pocketmine\event\Listener;
 use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;

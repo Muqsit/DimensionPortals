@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace muqsit\netherportal;
+namespace muqsit\dimensionportals;
 
-use muqsit\netherportal\exoblock\ExoBlockFactory;
-use muqsit\netherportal\player\PlayerManager;
-use muqsit\netherportal\world\WorldManager;
+use muqsit\dimensionportals\exoblock\ExoBlockFactory;
+use muqsit\dimensionportals\player\PlayerManager;
+use muqsit\dimensionportals\world\WorldManager;
 use pocketmine\plugin\PluginBase;
 
 final class Loader extends PluginBase{
@@ -15,8 +15,5 @@ final class Loader extends PluginBase{
 		ExoBlockFactory::init($this);
 		PlayerManager::init($this);
 		WorldManager::init($this);
-	}
-
-	protected function onDisable() : void{
 	}
 }

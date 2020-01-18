@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace muqsit\netherportal\player;
+namespace muqsit\dimensionportals\player;
 
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;

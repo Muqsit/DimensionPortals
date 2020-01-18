@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace muqsit\netherportal\world;
+namespace muqsit\dimensionportals\world;
 
-use muqsit\netherportal\player\PlayerManager;
+use muqsit\dimensionportals\player\PlayerManager;
 use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\world\ChunkLoadEvent;
@@ -26,26 +26,26 @@ final class WorldListener implements Listener{
 	/**
 	 * @param ChunkLoadEvent $event
 	 * @priority MONITOR
-	 */
+	 *//*
 	public function onChunkLoad(ChunkLoadEvent $event) : void{
 		$chunk = $event->getChunk();
 		$world = WorldManager::get($event->getWorld());
 		if($world !== null){
 			$world->onChunkLoad($chunk->getX(), $chunk->getZ());
 		}
-	}
+	}*/
 
 	/**
 	 * @param ChunkUnloadEvent $event
 	 * @priority MONITOR
-	 */
+	 *//*
 	public function onChunkUnload(ChunkUnloadEvent $event) : void{
 		$chunk = $event->getChunk();
 		$world = WorldManager::get($event->getWorld());
 		if($world !== null){
 			$world->onChunkUnload($chunk->getX(), $chunk->getZ());
 		}
-	}
+	}*/
 
 	/**
 	 * @param EntityTeleportEvent $event

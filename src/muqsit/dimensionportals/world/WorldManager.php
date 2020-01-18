@@ -2,19 +2,21 @@
 
 declare(strict_types=1);
 
-namespace muqsit\netherportal\world;
+namespace muqsit\dimensionportals\world;
 
-use muqsit\netherportal\Loader;
-use muqsit\netherportal\world\nether\NetherWorldInstance;
-use muqsit\netherportal\world\overworld\OverworldInstance;
+use muqsit\dimensionportals\Loader;
+use muqsit\dimensionportals\world\end\EndWorldInstance;
+use muqsit\dimensionportals\world\nether\NetherWorldInstance;
+use muqsit\dimensionportals\world\overworld\OverworldInstance;
 use pocketmine\Server;
 use pocketmine\world\World;
 use RuntimeException;
 
 final class WorldManager{
 
-	public const TYPE_OVERWORLD = 0;
-	public const TYPE_NETHER = 1;
+	private const TYPE_OVERWORLD = 0;
+	private const TYPE_NETHER = 1;
+	private const TYPE_END = 2;
 
 	/** @var string[] */
 	private static $types = [];
@@ -25,12 +27,14 @@ final class WorldManager{
 	public static function init(Loader $plugin) : void{
 		$config = $plugin->getConfig();
 		self::$types = [
-			self::TYPE_OVERWORLD => $config->getNested("worlds.overworld"),
-			self::TYPE_NETHER => $config->getNested("worlds.nether")
+			self::TYPE_OVERWORLD => $config->getNested("overworld.world"),
+			self::TYPE_NETHER => $config->getNested("nether.world"),
+			self::TYPE_END => $config->getNested("end.world")
 		];
 
 		self::registerWorldHolder(self::TYPE_OVERWORLD, new WorldHolder(OverworldInstance::class));
 		self::registerWorldHolder(self::TYPE_NETHER, new WorldHolder(NetherWorldInstance::class));
+		self::registerWorldHolder(self::TYPE_END, new WorldHolder(EndWorldInstance::class));
 
 		$plugin->getServer()->getPluginManager()->registerEvents(new WorldListener(), $plugin);
 	}
@@ -67,11 +71,12 @@ final class WorldManager{
 		return self::getFromType(self::TYPE_NETHER);
 	}
 
-	public static function getFromType(int $type) : WorldInstance{
-		return self::$worlds[self::$types[$type]]->getWorldInstance();
+	public static function getEnd() : EndWorldInstance{
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
+		return self::getFromType(self::TYPE_END);
 	}
 
-	public static function isOfType(World $world, int $type) : bool{
-		return self::$types[$type] === $world->getFolderName();
+	private static function getFromType(int $type) : WorldInstance{
+		return self::$worlds[self::$types[$type]]->getWorldInstance();
 	}
 }

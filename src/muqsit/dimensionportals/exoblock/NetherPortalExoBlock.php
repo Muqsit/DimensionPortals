@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-namespace muqsit\netherportal\exoblock;
+namespace muqsit\dimensionportals\exoblock;
 
 use Ds\Queue;
-use muqsit\netherportal\player\PlayerManager;
+
+use muqsit\dimensionportals\world\WorldInstance;
+use muqsit\dimensionportals\world\WorldManager;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockLegacyIds;
@@ -17,7 +19,19 @@ use pocketmine\player\Player;
 use pocketmine\world\utils\SubChunkIteratorManager;
 use pocketmine\world\World;
 
-class PortalExoBlock implements ExoBlock{
+class NetherPortalExoBlock extends PortalExoBlock{
+
+	/** @var int */
+	private $frame_block_id;
+
+	public function __construct(int $teleportation_duration, Block $frame_block){
+		parent::__construct($teleportation_duration);
+		$this->frame_block_id = $frame_block;
+	}
+
+	public function getTargetWorldInstance() : WorldInstance{
+		return WorldManager::getNether();
+	}
 
 	public function update(Block $wrapping) : bool{
 		$pos = $wrapping->getPos();
@@ -54,17 +68,9 @@ class PortalExoBlock implements ExoBlock{
 		return false;
 	}
 
-	public function onPlayerMoveInside(Player $player) : void{
-		PlayerManager::get($player)->onEnterPortal();
-	}
-
-	public function onPlayerMoveOutside(Player $player) : void{
-		PlayerManager::get($player)->onLeavePortal();
-	}
-
 	public function isValid(Block $block) : bool{
 		$blockId = $block->getId();
-		return $blockId === ExoBlockFactory::$FRAME_BLOCK_ID || $blockId === BlockLegacyIds::PORTAL;
+		return $blockId === $this->frame_block_id || $blockId === BlockLegacyIds::PORTAL;
 	}
 
 	public function fill(World $world, Vector3 $origin, int $metadata) : void{

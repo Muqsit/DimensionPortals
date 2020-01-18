@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace muqsit\netherportal\player;
+namespace muqsit\dimensionportals\player;
 
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerLoginEvent;

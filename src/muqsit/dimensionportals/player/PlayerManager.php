@@ -2,16 +2,13 @@
 
 declare(strict_types=1);
 
-namespace muqsit\netherportal\player;
+namespace muqsit\dimensionportals\player;
 
-use muqsit\netherportal\Loader;
+use muqsit\dimensionportals\Loader;
 use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 
 final class PlayerManager{
-
-	/** @var int */
-	public static $TICKS_BEFORE_TELEPORTING;
 
 	/** @var PlayerInstance[] */
 	private static $players = [];
@@ -20,8 +17,6 @@ final class PlayerManager{
 	private static $ticking = [];
 
 	public static function init(Loader $plugin) : void{
-		self::$TICKS_BEFORE_TELEPORTING = (int) $plugin->getConfig()->get("teleportation-wait-period");
-
 		$plugin->getServer()->getPluginManager()->registerEvents(new PlayerListener(), $plugin);
 		$plugin->getServer()->getPluginManager()->registerEvents(new PlayerNetworkListener(), $plugin);
 		$plugin->getServer()->getPluginManager()->registerEvents(new PlayerDimensionChangeListener(), $plugin);

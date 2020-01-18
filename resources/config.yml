@@ -1,18 +1,25 @@
-# NetherPortal v0.0.1
+# DimensionPortals v0.0.1
 
-# Portal dimensions cap
-max-portal-width: 30
-max-portal-height: 30
+overworld:
+  # Folder name of the world to use for overworld
+  world: world
 
-# Frame block surrounding the portal
-portal-frame-block: OBSIDIAN
+nether:
+  # Folder name of the world to use for nether
+  world: nether
+  # The number of ticks the player must wait in portal
+  # before they get teleported to the nether.
+  teleportation-duration: 80
+  portal:
+    # Frame block surrounding the portal
+    frame-block: OBSIDIAN
+    # Portal dimensions cap
+    max-width: 30
+    amx-height: 30
 
-# The number of ticks the player must be in portal
-# before they get teleported to the nether.
-teleportation-wait-period: 80
-
-# Configure the worlds folder to use for overworld
-# and nether.
-worlds:
-  overworld: world
-  nether: nether
+end:
+  # Folder name of the world to use for end
+  world: end
+  # The number of ticks the player must wait in portal
+  # before they get teleported to the end.
+  teleportation-duration: 0

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace muqsit\netherportal\exoblock;
+namespace muqsit\dimensionportals\exoblock;
 
 use pocketmine\event\block\BlockUpdateEvent;
 use pocketmine\event\Listener;
@@ -28,10 +28,12 @@ final class ExoBlockEventHandler implements Listener{
 	 * @priority NORMAL
 	 */
 	public function onPlayerInteract(PlayerInteractEvent $event) : void{
-		$block = $event->getBlock();
-		$exo_block = ExoBlockFactory::get($block);
-		if($exo_block !== null && $exo_block->interact($block, $event->getPlayer(), $event->getItem(), $event->getFace())){
-			$event->setCancelled();
+		if($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_BLOCK){
+			$block = $event->getBlock();
+			$exo_block = ExoBlockFactory::get($block);
+			if($exo_block !== null && $exo_block->interact($block, $event->getPlayer(), $event->getItem(), $event->getFace())){
+				$event->setCancelled();
+			}
 		}
 	}
 

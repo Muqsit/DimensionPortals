@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace muqsit\netherportal\exoblock;
+namespace muqsit\dimensionportals\exoblock;
 
 use pocketmine\block\Block;
 use pocketmine\item\Item;

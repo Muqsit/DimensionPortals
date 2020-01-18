@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace muqsit\netherportal\world;
+namespace muqsit\dimensionportals\world;
 
-use pocketmine\player\Player;
 use pocketmine\world\World;
 
 abstract class WorldInstance{
@@ -22,13 +21,7 @@ abstract class WorldInstance{
 
 	abstract public function getNetworkDimensionId() : int;
 
-	abstract public function getParallelUniverse() : WorldInstance; // TODO: give this a better name
-
 	abstract public function onChunkLoad(int $chunkX, int $chunkZ) : void;
 
 	abstract public function onChunkUnload(int $chunkX, int $chunkZ) : void;
-
-	final public function addToDimension(Player $player) : void{
-		$player->teleport($this->getWorld()->getSafeSpawn());
-	}
 }
