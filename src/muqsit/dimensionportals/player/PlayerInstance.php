@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace muqsit\dimensionportals\player;
 
-use muqsit\dimensionportals\event\player\PlayerEnterPortalsEvent;
-use muqsit\dimensionportals\event\player\PlayerPortalsTeleportEvent;
+use muqsit\dimensionportals\event\player\PlayerEnterPortalEvent;
+use muqsit\dimensionportals\event\player\PlayerPortalTeleportEvent;
 use muqsit\dimensionportals\exoblock\PortalExoBlock;
 use muqsit\dimensionportals\world\WorldManager;
 use pocketmine\entity\Location;
@@ -28,7 +28,7 @@ final class PlayerInstance{
 
 	public function onEnterPortal(PortalExoBlock $block) : void{
 		PlayerManager::scheduleTicking($this->player);
-		($ev = new PlayerEnterPortalsEvent($this->player, $block, $this->player->isCreative() ? 0 : $block->getTeleportationDuration()))->call();
+		($ev = new PlayerEnterPortalEvent($this->player, $block, $this->player->isCreative() ? 0 : $block->getTeleportationDuration()))->call();
 		if(!$ev->isCancelled()){
 			$this->in_portal = new PlayerPortalInfo($block, $ev->getTeleportDuration());
 		}
@@ -67,7 +67,7 @@ final class PlayerInstance{
 	private function teleport() : void{
 		$to = $this->in_portal->getBlock()->getTargetWorldInstance();
 		$target = Location::fromObject(($to === null || WorldManager::get($this->player->getWorld()) === $to ? WorldManager::getOverworld() : $to)->getWorld()->getSpawnLocation());
-		($ev = new PlayerPortalsTeleportEvent($this->player, $this->in_portal->getBlock(), $target))->call();
+		($ev = new PlayerPortalTeleportEvent($this->player, $this->in_portal->getBlock(), $target))->call();
 		if(!$ev->isCancelled()){
 			$this->player->teleport($ev->getTarget());
 		}

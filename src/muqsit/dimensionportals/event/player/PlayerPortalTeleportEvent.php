@@ -6,11 +6,12 @@ namespace muqsit\dimensionportals\event\player;
 
 use muqsit\dimensionportals\event\DimensionPortalsEvent;
 use muqsit\dimensionportals\exoblock\PortalExoBlock;
+use pocketmine\entity\Location;
 use pocketmine\event\Cancellable;
 use pocketmine\event\CancellableTrait;
 use pocketmine\player\Player;
 
-class PlayerEnterPortalsEvent extends DimensionPortalsEvent implements Cancellable{
+class PlayerPortalTeleportEvent extends DimensionPortalsEvent implements Cancellable{
 	use CancellableTrait;
 
 	/** @var Player */
@@ -19,13 +20,13 @@ class PlayerEnterPortalsEvent extends DimensionPortalsEvent implements Cancellab
 	/** @var PortalExoBlock */
 	private $block;
 
-	/** @var int */
-	private $teleport_duration;
+	/** @var Location */
+	private $target;
 
-	public function __construct(Player $player, PortalExoBlock $block, int $teleport_duration){
+	public function __construct(Player $player, PortalExoBlock $block, Location $target){
 		$this->player = $player;
 		$this->block = $block;
-		$this->teleport_duration = $teleport_duration;
+		$this->target = $target;
 	}
 
 	public function getPlayer() : Player{
@@ -36,11 +37,11 @@ class PlayerEnterPortalsEvent extends DimensionPortalsEvent implements Cancellab
 		return $this->block;
 	}
 
-	public function getTeleportDuration() : int{
-		return $this->teleport_duration;
+	public function getTarget() : Location{
+		return $this->target->asLocation();
 	}
 
-	public function setTeleportDuration(int $teleport_duration) : void{
-		$this->teleport_duration = $teleport_duration;
+	public function setTarget(Location $target) : void{
+		$this->target = $target->asLocation();
 	}
 }
