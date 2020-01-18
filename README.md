@@ -1,5 +1,5 @@
 # DimensionPortals
-Nether portal creation and destruction was ported from [MiNET](https://github.com/NiclasOlofsson/MiNET).
+Nether portal creation and destruction was ported from [MiNET](https://github.com/NiclasOlofsson/MiNET).<br>
 End portal creation and destruction was ported from [GlowstoneMC](https://github.com/GlowstoneMC/Glowstone).
 
 ### What does this plugin do
