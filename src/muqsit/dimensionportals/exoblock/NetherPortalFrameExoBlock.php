@@ -23,7 +23,7 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 	private $lengthSquared;
 
 	public function __construct(Block $frame_block, int $max_portal_height, int $max_portal_width){
-		$this->frame_block_id = $frame_block;
+		$this->frame_block_id = $frame_block->getId();
 		$this->lengthSquared = (new Vector2($max_portal_height, $max_portal_width))->lengthSquared();
 	}
 
@@ -31,10 +31,9 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 		if($item->getId() === ItemIds::FLINT_AND_STEEL){
 			$affectedBlock = $wrapping->getSide($face);
 			if($affectedBlock->getId() === BlockLegacyIds::AIR){
-				$pos = $affectedBlock->getPos();
 				/** @var World $world */
-				$world = $pos->getWorld();
-
+				$world = $player->getWorld();
+				$pos = $affectedBlock->getPos()->asVector3();
 				$blocks = $this->fill($world, $pos, 10, Facing::WEST);
 				if(count($blocks) === 0){
 					$blocks = $this->fill($world, $pos, 10, Facing::NORTH);
@@ -74,14 +73,14 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 				return [];
 			}
 
+			$coordinates_hash = World::blockHash($coordinates->x, $coordinates->y, $coordinates->z);
+			$block = $world->getBlockAt($coordinates->x, $coordinates->y, $coordinates->z);
+
 			if(
-				$world->getBlockAt($coordinates->x, $coordinates->y, $coordinates->z)->getId() === BlockLegacyIds::AIR &&
+				$block->getId() === BlockLegacyIds::AIR &&
 				ArrayUtils::firstOrDefault(
 					$blocks,
-					static function(int $hash, Block $block) use($coordinates) : bool{
-						World::getBlockXYZ($hash, $x, $y, $z);
-						return $coordinates->x === $x && $coordinates->y === $y && $coordinates->z === $z;
-					}
+					static function(int $hash, Block $block) use($coordinates_hash) : bool{ return $hash === $coordinates_hash; }
 				) === null
 			){
 				$this->visit($coordinates, $blocks, $direction);
@@ -100,11 +99,8 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 					$coordinates->getSide(Facing::UP),
 					$coordinates->getSide(Facing::DOWN)
 				);
-			}else{
-				$block = $world->getBlockAt($coordinates->x, $coordinates->y, $coordinates->z);
-				if(!$this->isValid($block, $coordinates, $blocks)){
-					return [];
-				}
+			}elseif(!$this->isValid($block, $coordinates_hash, $blocks)){
+				return [];
 			}
 		}
 
@@ -115,17 +111,11 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 		$blocks[World::blockHash($coordinates->x, $coordinates->y, $coordinates->z)] = BlockFactory::get(BlockLegacyIds::PORTAL, $direction - 2);
 	}
 
-	private function isValid(Block $block, Vector3 $coordinates, array $portals) : bool{
+	private function isValid(Block $block, int $coordinates_hash, array $portals) : bool{
 		return $block->getId() === $this->frame_block_id ||
 			ArrayUtils::firstOrDefault(
 				$portals,
-				static function(int $hash, Block $b) use($coordinates) : bool{
-					if($b->getId() === BlockLegacyIds::PORTAL){
-						World::getBlockXYZ($hash, $x, $y, $z);
-						return $coordinates->x === $x && $coordinates->y === $y && $coordinates->z === $z;
-					}
-					return false;
-				}
+				static function(int $hash, Block $b) use($coordinates_hash) : bool{ return $hash === $coordinates_hash && $b->getId() === BlockLegacyIds::PORTAL; }
 			) !== null;
 	}
 }

@@ -47,15 +47,15 @@ final class ExoBlockFactory{
 	}
 
 	public static function register(ExoBlock $exo_block, Block $block) : void{
-		self::$blocks[$block->getRuntimeId()] = $exo_block;
+		self::$blocks[$block->getFullId()] = $exo_block;
 		foreach(BlockFactory::getAllKnownStates() as $state){
 			if($state->getId() === $block->getId()){
-				self::$blocks[$state->getRuntimeId()] = $exo_block;
+				self::$blocks[$state->getFullId()] = $exo_block;
 			}
 		}
 	}
 
 	public static function get(Block $block) : ?ExoBlock{
-		return self::$blocks[$block->getRuntimeId()] ?? null;
+		return self::$blocks[$block->getFullId()] ?? null;
 	}
 }
