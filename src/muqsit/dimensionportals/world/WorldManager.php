@@ -62,18 +62,21 @@ final class WorldManager{
 	}
 
 	public static function getOverworld() : OverworldInstance{
-		/** @noinspection PhpIncompatibleReturnTypeInspection */
-		return self::getFromType(self::TYPE_OVERWORLD);
+		$world = self::getFromType(self::TYPE_OVERWORLD);
+		assert($world instanceof OverworldInstance);
+		return $world;
 	}
 
 	public static function getNether() : NetherWorldInstance{
-		/** @noinspection PhpIncompatibleReturnTypeInspection */
-		return self::getFromType(self::TYPE_NETHER);
+		$world = self::getFromType(self::TYPE_NETHER);
+		assert($world instanceof NetherWorldInstance);
+		return $world;
 	}
 
 	public static function getEnd() : EndWorldInstance{
-		/** @noinspection PhpIncompatibleReturnTypeInspection */
-		return self::getFromType(self::TYPE_END);
+		$world = self::getFromType(self::TYPE_END);
+		assert($world instanceof EndWorldInstance);
+		return $world;
 	}
 
 	private static function getFromType(int $type) : WorldInstance{

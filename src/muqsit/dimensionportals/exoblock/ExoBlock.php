@@ -32,11 +32,13 @@ interface ExoBlock{
 
 	/**
 	 * @param Player $player
+	 * @param Block $block
 	 */
-	public function onPlayerMoveInside(Player $player) : void;
+	public function onPlayerMoveInside(Player $player, Block $block) : void;
 
 	/**
 	 * @param Player $player
+	 * @param Block $block
 	 */
-	public function onPlayerMoveOutside(Player $player) : void;
+	public function onPlayerMoveOutside(Player $player, Block $block) : void;
 }

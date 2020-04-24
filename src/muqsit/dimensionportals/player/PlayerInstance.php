@@ -66,7 +66,7 @@ final class PlayerInstance{
 
 	private function teleport() : void{
 		$to = $this->in_portal->getBlock()->getTargetWorldInstance();
-		$target = Location::fromObject(($to === null || WorldManager::get($this->player->getWorld()) === $to ? WorldManager::getOverworld() : $to)->getWorld()->getSpawnLocation());
+		$target = Location::fromObject((WorldManager::get($this->player->getWorld()) === $to ? WorldManager::getOverworld() : $to)->getWorld()->getSpawnLocation());
 		($ev = new PlayerPortalTeleportEvent($this->player, $this->in_portal->getBlock(), $target))->call();
 		if(!$ev->isCancelled()){
 			$this->player->teleport($ev->getTarget());

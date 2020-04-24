@@ -26,7 +26,7 @@ class NetherPortalExoBlock extends PortalExoBlock{
 
 	public function __construct(int $teleportation_duration, Block $frame_block){
 		parent::__construct($teleportation_duration);
-		$this->frame_block_id = $frame_block;
+		$this->frame_block_id = $frame_block->getId();
 	}
 
 	public function getTargetWorldInstance() : WorldInstance{
@@ -79,12 +79,14 @@ class NetherPortalExoBlock extends PortalExoBlock{
 		$iterator = new SubChunkIteratorManager($world);
 		$air = VanillaBlocks::AIR();
 
+		$block_factory = BlockFactory::getInstance();
+
 		while(!$visits->isEmpty()){
 			/** @var Vector3 $coordinates */
 			$coordinates = $visits->pop();
 			if(
 				!$iterator->moveTo($coordinates->x, $coordinates->y, $coordinates->z, false) ||
-				BlockFactory::fromFullBlock($iterator->currentSubChunk->getFullBlock($coordinates->x & 0x0f, $coordinates->y & 0x0f, $coordinates->z & 0x0f))->getId() !== BlockLegacyIds::PORTAL
+				$block_factory->fromFullBlock($iterator->currentSubChunk->getFullBlock($coordinates->x & 0x0f, $coordinates->y & 0x0f, $coordinates->z & 0x0f))->getId() !== BlockLegacyIds::PORTAL
 			){
 				continue;
 			}

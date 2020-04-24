@@ -48,7 +48,7 @@ class EndPortalFrameExoBlock implements ExoBlock{
 			/** @var World $world */
 			$world = $pos->getWorld();
 			$world->setBlockAt($pos->x, $pos->y, $pos->z, $wrapping, false);
-			$world->dropItem($pos->add(0.5, 0.75, 0.5), ItemFactory::get(ItemIds::ENDER_EYE));
+			$world->dropItem($pos->add(0.5, 0.75, 0.5), ItemFactory::getInstance()->get(ItemIds::ENDER_EYE));
 			$this->tryDestroyingPortal($wrapping);
 			return true;
 		}
@@ -62,10 +62,10 @@ class EndPortalFrameExoBlock implements ExoBlock{
 		return false;
 	}
 
-	public function onPlayerMoveInside(Player $player) : void{
+	public function onPlayerMoveInside(Player $player, Block $block) : void{
 	}
 
-	public function onPlayerMoveOutside(Player $player) : void{
+	public function onPlayerMoveOutside(Player $player, Block $block) : void{
 	}
 
 	public function isCompletedPortal(Block $center) : bool{
@@ -96,9 +96,10 @@ class EndPortalFrameExoBlock implements ExoBlock{
 		$pos = $center->getPos();
 		/** @var World $world */
 		$world = $pos->getWorld();
+		$block_factory = BlockFactory::getInstance();
 		for($i = -1; $i <= 1; ++$i){
 			for($j = -1; $j <= 1; ++$j){
-				$world->setBlockAt($pos->x + $i, $pos->y, $pos->z + $j, BlockFactory::get(BlockLegacyIds::END_PORTAL), false);
+				$world->setBlockAt($pos->x + $i, $pos->y, $pos->z + $j, $block_factory->get(BlockLegacyIds::END_PORTAL), false);
 			}
 		}
 	}

@@ -19,7 +19,7 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 	/** @var int */
 	private $frame_block_id;
 
-	/** @var int */
+	/** @var float */
 	private $lengthSquared;
 
 	public function __construct(Block $frame_block, int $max_portal_height, int $max_portal_width){
@@ -31,7 +31,6 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 		if($item->getId() === ItemIds::FLINT_AND_STEEL){
 			$affectedBlock = $wrapping->getSide($face);
 			if($affectedBlock->getId() === BlockLegacyIds::AIR){
-				/** @var World $world */
 				$world = $player->getWorld();
 				$pos = $affectedBlock->getPos()->asVector3();
 				$blocks = $this->fill($world, $pos, 10, Facing::WEST);
@@ -56,12 +55,19 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 		return false;
 	}
 
-	public function onPlayerMoveInside(Player $player) : void{
+	public function onPlayerMoveInside(Player $player, Block $block) : void{
 	}
 
-	public function onPlayerMoveOutside(Player $player) : void{
+	public function onPlayerMoveOutside(Player $player, Block $block) : void{
 	}
 
+	/**
+	 * @param World $world
+	 * @param Vector3 $origin
+	 * @param int $radius
+	 * @param int $direction
+	 * @return array<int, Block>
+	 */
 	public function fill(World $world, Vector3 $origin, int $radius, int $direction) : array{
 		$blocks = [];
 
@@ -107,10 +113,21 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 		return $blocks;
 	}
 
+	/**
+	 * @param Vector3 $coordinates
+	 * @param array<int, Block> $blocks
+	 * @param int $direction
+	 */
 	public function visit(Vector3 $coordinates, array &$blocks, int $direction) : void{
-		$blocks[World::blockHash($coordinates->x, $coordinates->y, $coordinates->z)] = BlockFactory::get(BlockLegacyIds::PORTAL, $direction - 2);
+		$blocks[World::blockHash($coordinates->x, $coordinates->y, $coordinates->z)] = BlockFactory::getInstance()->get(BlockLegacyIds::PORTAL, $direction - 2);
 	}
 
+	/**
+	 * @param Block $block
+	 * @param int $coordinates_hash
+	 * @param array<int, Block> $portals
+	 * @return bool
+	 */
 	private function isValid(Block $block, int $coordinates_hash, array $portals) : bool{
 		return $block->getId() === $this->frame_block_id ||
 			ArrayUtils::firstOrDefault(
