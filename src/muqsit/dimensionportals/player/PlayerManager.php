@@ -20,7 +20,7 @@ final class PlayerManager{
 		$plugin->getServer()->getPluginManager()->registerEvents(new PlayerListener(), $plugin);
 		$plugin->getServer()->getPluginManager()->registerEvents(new PlayerNetworkListener(), $plugin);
 		$plugin->getServer()->getPluginManager()->registerEvents(new PlayerDimensionChangeListener(), $plugin);
-		$plugin->getScheduler()->scheduleRepeatingTask(new ClosureTask(static function(int $currentTick) : void{
+		$plugin->getScheduler()->scheduleRepeatingTask(new ClosureTask(static function() : void{
 			foreach(self::$ticking as $player_id){
 				self::$players[$player_id]->tick();
 			}
