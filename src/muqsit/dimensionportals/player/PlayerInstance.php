@@ -27,10 +27,10 @@ final class PlayerInstance{
 	}
 
 	public function onEnterPortal(PortalExoBlock $block) : void{
-		PlayerManager::scheduleTicking($this->player);
 		($ev = new PlayerEnterPortalEvent($this->player, $block, $this->player->isCreative() ? 0 : $block->getTeleportationDuration()))->call();
 		if(!$ev->isCancelled()){
 			$this->in_portal = new PlayerPortalInfo($block, $ev->getTeleportDuration());
+			PlayerManager::scheduleTicking($this->player);
 		}
 	}
 
