@@ -10,6 +10,7 @@ use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\network\mcpe\protocol\PlayerActionPacket;
 use pocketmine\network\mcpe\protocol\StartGamePacket;
+use pocketmine\network\mcpe\protocol\types\SpawnSettings;
 use pocketmine\Server;
 
 final class PlayerNetworkListener implements Listener{
@@ -28,14 +29,18 @@ final class PlayerNetworkListener implements Listener{
 					$world = WorldManager::get($target->getPlayer()->getWorld());
 					if($world !== null){
 						$dimensionId = $world->getNetworkDimensionId();
-						if($dimensionId !== $packet->dimension){
+						if($dimensionId !== $packet->spawnSettings->getDimension()){
 							$event->setCancelled();
 							foreach($targets as $target2){
 								/** @noinspection NullPointerExceptionInspection */
 								$world = WorldManager::get($target2->getPlayer()->getWorld());
 								if($world !== null){
 									$pk = clone $packet;
-									$pk->dimension = $world->getNetworkDimensionId();
+									$pk->spawnSettings = new SpawnSettings(
+										$packet->spawnSettings->getBiomeType(),
+										$packet->spawnSettings->getBiomeName(),
+										$world->getNetworkDimensionId()
+									);
 									$target2->sendDataPacket($pk);
 								}else{
 									$target2->sendDataPacket(clone $packet);
