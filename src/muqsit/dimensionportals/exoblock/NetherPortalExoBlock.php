@@ -16,7 +16,7 @@ use pocketmine\item\Item;
 use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
-use pocketmine\world\utils\SubChunkIteratorManager;
+use pocketmine\world\utils\SubChunkExplorer;
 use pocketmine\world\World;
 
 class NetherPortalExoBlock extends PortalExoBlock{
@@ -76,7 +76,7 @@ class NetherPortalExoBlock extends PortalExoBlock{
 	public function fill(World $world, Vector3 $origin, int $metadata) : void{
 		$visits = new Queue([$origin]);
 
-		$iterator = new SubChunkIteratorManager($world);
+		$iterator = new SubChunkExplorer($world);
 		$air = VanillaBlocks::AIR();
 
 		$block_factory = BlockFactory::getInstance();

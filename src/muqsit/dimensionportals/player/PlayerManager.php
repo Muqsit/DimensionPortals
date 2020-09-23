@@ -5,6 +5,12 @@ declare(strict_types=1);
 namespace muqsit\dimensionportals\player;
 
 use muqsit\dimensionportals\Loader;
+use muqsit\dimensionportals\world\WorldManager;
+use muqsit\simplepackethandler\SimplePacketHandler;
+use pocketmine\network\mcpe\NetworkSession;
+use pocketmine\network\mcpe\protocol\PlayerActionPacket;
+use pocketmine\network\mcpe\protocol\StartGamePacket;
+use pocketmine\network\mcpe\protocol\types\SpawnSettings;
 use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 
@@ -18,8 +24,36 @@ final class PlayerManager{
 
 	public static function init(Loader $plugin) : void{
 		$plugin->getServer()->getPluginManager()->registerEvents(new PlayerListener(), $plugin);
-		$plugin->getServer()->getPluginManager()->registerEvents(new PlayerNetworkListener(), $plugin);
 		$plugin->getServer()->getPluginManager()->registerEvents(new PlayerDimensionChangeListener(), $plugin);
+
+		SimplePacketHandler::createInterceptor($plugin)->interceptOutgoing(static function(StartGamePacket $packet, NetworkSession $target) : bool{
+			/** @noinspection NullPointerExceptionInspection */
+			$world = WorldManager::get($target->getPlayer()->getWorld());
+			if($world !== null){
+				$dimensionId = $world->getNetworkDimensionId();
+				if($dimensionId !== $packet->spawnSettings->getDimension()){
+					$pk = clone $packet;
+					$pk->spawnSettings = new SpawnSettings(
+						$packet->spawnSettings->getBiomeType(),
+						$packet->spawnSettings->getBiomeName(),
+						$world->getNetworkDimensionId()
+					);
+					$target->sendDataPacket($pk);
+					return false;
+				}
+			}
+			return true;
+		});
+
+		SimplePacketHandler::createMonitor($plugin)->monitorIncoming(static function(PlayerActionPacket $packet, NetworkSession $origin) : void{
+			if($packet instanceof PlayerActionPacket && $packet->action === PlayerActionPacket::ACTION_DIMENSION_CHANGE_ACK){
+				$player = $origin->getPlayer();
+				if($player !== null && $player->isOnline()){
+					PlayerManager::get($player)->onEndDimensionChange();
+				}
+			}
+		});
+
 		$plugin->getScheduler()->scheduleRepeatingTask(new ClosureTask(static function() : void{
 			foreach(self::$ticking as $player_id){
 				self::$players[$player_id]->tick();
