@@ -19,7 +19,7 @@ final class ExoBlockEventHandler implements Listener{
 		$block = $event->getBlock();
 		$exo_block = ExoBlockFactory::get($block);
 		if($exo_block !== null && $exo_block->update($block)){
-			$event->setCancelled();
+			$event->cancel();
 		}
 	}
 
@@ -32,7 +32,7 @@ final class ExoBlockEventHandler implements Listener{
 			$block = $event->getBlock();
 			$exo_block = ExoBlockFactory::get($block);
 			if($exo_block !== null && $exo_block->interact($block, $event->getPlayer(), $event->getItem(), $event->getFace())){
-				$event->setCancelled();
+				$event->cancel();
 			}
 		}
 	}
