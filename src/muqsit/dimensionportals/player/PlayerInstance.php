@@ -9,6 +9,7 @@ use muqsit\dimensionportals\event\player\PlayerPortalTeleportEvent;
 use muqsit\dimensionportals\exoblock\PortalExoBlock;
 use muqsit\dimensionportals\world\WorldManager;
 use pocketmine\entity\Location;
+use pocketmine\network\mcpe\protocol\PlayStatusPacket;
 use pocketmine\player\Player;
 
 final class PlayerInstance{
@@ -45,6 +46,7 @@ final class PlayerInstance{
 
 	public function onEndDimensionChange() : void{
 		$this->changing_dimension = false;
+		$this->player->getNetworkSession()->sendDataPacket(PlayStatusPacket::create(PlayStatusPacket::PLAYER_SPAWN));
 	}
 
 	/**

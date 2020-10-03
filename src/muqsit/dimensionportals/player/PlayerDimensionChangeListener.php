@@ -20,7 +20,7 @@ final class PlayerDimensionChangeListener implements Listener{
 	private function cancelIfChangingDimension(Player $player, Cancellable $event) : bool{
 		$instance = PlayerManager::getNullable($player);
 		if($instance !== null && $instance->isChangingDimension()){
-			assert(method_exists($event, "setCancelled"));
+			assert(method_exists($event, "cancel"));
 			$event->cancel();
 			return true;
 		}
