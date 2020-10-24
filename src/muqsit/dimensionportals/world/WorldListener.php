@@ -58,12 +58,7 @@ final class WorldListener implements Listener{
 			$to = $event->getTo();
 			$to_world = WorldManager::get($to->getWorld()) ?? WorldManager::getOverworld();
 			if($from_world->getNetworkDimensionId() !== $to_world->getNetworkDimensionId()){
-				$packet = new ChangeDimensionPacket();
-				$packet->dimension = $to_world->getNetworkDimensionId();
-				$packet->position = $to->asVector3();
-				$packet->respawn = !$player->isAlive();
-				$player->getNetworkSession()->sendDataPacket($packet);
-				PlayerManager::get($player)->onBeginDimensionChange();
+				PlayerManager::get($player)->onBeginDimensionChange($to_world->getNetworkDimensionId(), $to->asVector3(), !$player->isAlive());
 			}
 		}
 	}
