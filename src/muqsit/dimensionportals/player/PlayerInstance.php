@@ -51,10 +51,6 @@ final class PlayerInstance{
 		$packet->position = $position;
 		$packet->respawn = $respawn;
 		$session->sendDataPacket($packet);
-
-		$this->player->sendData([$this->player]);
-		$session->syncAttributes($this->player, $this->player->getAttributeMap()->getAll());
-		$session->syncViewAreaRadius($this->player->getViewDistance());
 	}
 
 	public function onEndDimensionChange() : void{
