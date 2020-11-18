@@ -36,8 +36,6 @@ class NetherPortalExoBlock extends PortalExoBlock{
 
 	public function update(Block $wrapping) : bool{
 		$pos = $wrapping->getPos();
-
-		/** @var World $world */
 		$world = $pos->getWorld();
 
 		$shouldKeep = 1;

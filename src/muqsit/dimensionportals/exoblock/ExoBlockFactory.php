@@ -43,7 +43,7 @@ final class ExoBlockFactory{
 
 	private static function initEnd(Config $config) : void{
 		self::register(new EndPortalFrameExoBlock(), VanillaBlocks::END_PORTAL_FRAME());
-		self::register(new EndPortalExoBlock($config->getNested("end.teleportation-duration")), BlockFactory::getInstance()->get(BlockLegacyIds::END_PORTAL));
+		self::register(new EndPortalExoBlock($config->getNested("end.teleportation-duration")), BlockFactory::getInstance()->get(BlockLegacyIds::END_PORTAL, 0));
 	}
 
 	public static function register(ExoBlock $exo_block, Block $block) : void{

@@ -14,7 +14,6 @@ use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\math\Facing;
 use pocketmine\player\Player;
-use pocketmine\world\World;
 use ReflectionProperty;
 
 class EndPortalFrameExoBlock implements ExoBlock{
@@ -37,7 +36,6 @@ class EndPortalFrameExoBlock implements ExoBlock{
 				$item->pop();
 				$this->property_eye->setValue($wrapping, true);
 				$pos = $wrapping->getPos();
-				/** @noinspection NullPointerExceptionInspection */
 				$pos->getWorld()->setBlockAt($pos->x, $pos->y, $pos->z, $wrapping, false);
 				$this->tryCreatingPortal($wrapping);
 				return true;
@@ -45,7 +43,6 @@ class EndPortalFrameExoBlock implements ExoBlock{
 		}elseif($item->getId() !== ItemIds::ENDER_EYE){
 			$this->property_eye->setValue($wrapping, false);
 			$pos = $wrapping->getPos();
-			/** @var World $world */
 			$world = $pos->getWorld();
 			$world->setBlockAt($pos->x, $pos->y, $pos->z, $wrapping, false);
 			$world->dropItem($pos->add(0.5, 0.75, 0.5), ItemFactory::getInstance()->get(ItemIds::ENDER_EYE));
@@ -94,12 +91,11 @@ class EndPortalFrameExoBlock implements ExoBlock{
 
 	public function createPortal(Block $center) : void{
 		$pos = $center->getPos();
-		/** @var World $world */
 		$world = $pos->getWorld();
 		$block_factory = BlockFactory::getInstance();
 		for($i = -1; $i <= 1; ++$i){
 			for($j = -1; $j <= 1; ++$j){
-				$world->setBlockAt($pos->x + $i, $pos->y, $pos->z + $j, $block_factory->get(BlockLegacyIds::END_PORTAL), false);
+				$world->setBlockAt($pos->x + $i, $pos->y, $pos->z + $j, $block_factory->get(BlockLegacyIds::END_PORTAL, 0), false);
 			}
 		}
 	}
@@ -117,7 +113,6 @@ class EndPortalFrameExoBlock implements ExoBlock{
 
 	public function destroyPortal(Block $center) : void{
 		$pos = $center->getPos();
-		/** @var World $world */
 		$world = $pos->getWorld();
 		for($i = -1; $i <= 1; ++$i){
 			for($j = -1; $j <= 1; ++$j){
