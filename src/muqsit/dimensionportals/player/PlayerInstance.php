@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace muqsit\dimensionportals\player;
 
+use Logger;
 use muqsit\dimensionportals\event\player\PlayerEnterPortalEvent;
 use muqsit\dimensionportals\event\player\PlayerPortalTeleportEvent;
 use muqsit\dimensionportals\exoblock\PortalExoBlock;
@@ -13,6 +14,7 @@ use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\ChangeDimensionPacket;
 use pocketmine\network\mcpe\protocol\PlayStatusPacket;
 use pocketmine\player\Player;
+use PrefixedLogger;
 
 final class PlayerInstance{
 
@@ -22,11 +24,15 @@ final class PlayerInstance{
 	/** @var PlayerPortalInfo|null */
 	private $in_portal;
 
+	/** @var Logger */
+	private $logger;
+
 	/** @var bool */
 	private $changing_dimension = false;
 
-	public function __construct(Player $player){
+	public function __construct(Player $player, Logger $logger){
 		$this->player = $player;
+		$this->logger = new PrefixedLogger($logger, $player->getName());
 	}
 
 	public function onEnterPortal(PortalExoBlock $block) : void{
@@ -51,11 +57,13 @@ final class PlayerInstance{
 		$packet->position = $position;
 		$packet->respawn = $respawn;
 		$session->sendDataPacket($packet);
+		$this->logger->debug("Started changing dimension (network_dimension_id: {$network_dimension_id}, position: {$position->asVector3()}, respawn: " . ($respawn ? "true" : "false") . ")");
 	}
 
 	public function onEndDimensionChange() : void{
 		$this->changing_dimension = false;
 		$this->player->getNetworkSession()->sendDataPacket(PlayStatusPacket::create(PlayStatusPacket::PLAYER_SPAWN));
+		$this->logger->debug("Stopped changing dimension");
 	}
 
 	/**

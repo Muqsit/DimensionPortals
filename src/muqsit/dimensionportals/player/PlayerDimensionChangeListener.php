@@ -9,7 +9,6 @@ use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\Cancellable;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
-use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerItemUseEvent;
@@ -83,16 +82,5 @@ final class PlayerDimensionChangeListener implements Listener{
 	 */
 	public function onBlockBreak(BlockBreakEvent $event) : void{
 		$this->cancelIfChangingDimension($event->getPlayer(), $event);
-	}
-
-	/**
-	 * @param EntityTeleportEvent $event
-	 * @priority LOW
-	 */
-	public function onEntityTeleport(EntityTeleportEvent $event) : void{
-		$entity = $event->getEntity();
-		if($entity instanceof Player){
-			$this->cancelIfChangingDimension($entity, $event);
-		}
 	}
 }
