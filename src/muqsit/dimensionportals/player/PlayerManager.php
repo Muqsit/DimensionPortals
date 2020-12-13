@@ -9,6 +9,7 @@ use muqsit\dimensionportals\Loader;
 use muqsit\dimensionportals\world\WorldManager;
 use muqsit\simplepackethandler\SimplePacketHandler;
 use pocketmine\network\mcpe\NetworkSession;
+use pocketmine\network\mcpe\protocol\MovePlayerPacket;
 use pocketmine\network\mcpe\protocol\PlayerActionPacket;
 use pocketmine\network\mcpe\protocol\StartGamePacket;
 use pocketmine\network\mcpe\protocol\types\SpawnSettings;
@@ -44,12 +45,18 @@ final class PlayerManager{
 				}
 			}
 			return true;
+		})->interceptIncoming(static function(MovePlayerPacket $packet, NetworkSession $origin) : bool{
+			$player = $origin->getPlayer();
+			if($player !== null && $player->isConnected() && PlayerManager::get($player)->isChangingDimension()){
+				return false;
+			}
+			return true;
 		});
 
 		SimplePacketHandler::createMonitor($plugin)->monitorIncoming(static function(PlayerActionPacket $packet, NetworkSession $origin) : void{
-			if($packet instanceof PlayerActionPacket && $packet->action === PlayerActionPacket::ACTION_DIMENSION_CHANGE_ACK){
+			if($packet->action === PlayerActionPacket::ACTION_DIMENSION_CHANGE_ACK){
 				$player = $origin->getPlayer();
-				if($player !== null && $player->isOnline()){
+				if($player !== null && $player->isConnected()){
 					PlayerManager::get($player)->onEndDimensionChange();
 				}
 			}
