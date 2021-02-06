@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace muqsit\dimensionportals\exoblock;
 
+use muqsit\dimensionportals\event\player\PlayerCreateEndPortalEvent;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockLegacyIds;
@@ -33,12 +34,15 @@ class EndPortalFrameExoBlock implements ExoBlock{
 		$eyed = $this->property_eye->getValue($wrapping);
 		if(!$eyed){
 			if($item->getId() === ItemIds::ENDER_EYE){
-				$item->pop();
-				$this->property_eye->setValue($wrapping, true);
-				$pos = $wrapping->getPos();
-				$pos->getWorld()->setBlockAt($pos->x, $pos->y, $pos->z, $wrapping, false);
-				$this->tryCreatingPortal($wrapping);
-				return true;
+				($ev = new PlayerCreateEndPortalEvent($player, $wrapping->getPos()))->call();
+				if(!$ev->isCancelled()){
+					$item->pop();
+					$this->property_eye->setValue($wrapping, true);
+					$pos = $wrapping->getPos();
+					$pos->getWorld()->setBlockAt($pos->x, $pos->y, $pos->z, $wrapping, false);
+					$this->tryCreatingPortal($wrapping);
+					return true;
+				}
 			}
 		}elseif($item->getId() !== ItemIds::ENDER_EYE){
 			$this->property_eye->setValue($wrapping, false);

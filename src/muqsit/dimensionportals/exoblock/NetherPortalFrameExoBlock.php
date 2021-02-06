@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace muqsit\dimensionportals\exoblock;
 
 use Ds\Queue;
+use muqsit\dimensionportals\event\player\PlayerCreateNetherPortalEvent;
 use muqsit\dimensionportals\utils\ArrayUtils;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;use pocketmine\block\BlockLegacyIds;
@@ -38,13 +39,16 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 					$blocks = $this->fill($world, $pos, 10, Facing::NORTH);
 				}
 				if(count($blocks) > 0){
-					foreach($blocks as $hash => $block){
-						if($block->getId() === BlockLegacyIds::PORTAL){
-							World::getBlockXYZ($hash, $x, $y, $z);
-							$world->setBlockAt($x, $y, $z, $block, false);
+					($ev = new PlayerCreateNetherPortalEvent($player, $wrapping->getPos()))->call();
+					if(!$ev->isCancelled()){
+						foreach($blocks as $hash => $block){
+							if($block->getId() === BlockLegacyIds::PORTAL){
+								World::getBlockXYZ($hash, $x, $y, $z);
+								$world->setBlockAt($x, $y, $z, $block, false);
+							}
 						}
+						return true;
 					}
-					return true;
 				}
 			}
 		}
