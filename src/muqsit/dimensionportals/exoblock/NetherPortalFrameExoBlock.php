@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace muqsit\dimensionportals\exoblock;
 
-use Ds\Queue;
 use muqsit\dimensionportals\event\player\PlayerCreateNetherPortalEvent;
 use muqsit\dimensionportals\utils\ArrayUtils;
 use pocketmine\block\Block;
@@ -14,6 +13,7 @@ use pocketmine\item\ItemIds;
 use pocketmine\math\Facing;
 use pocketmine\math\Vector2;use pocketmine\math\Vector3;use pocketmine\player\Player;
 use pocketmine\world\World;
+use SplQueue;
 
 class NetherPortalFrameExoBlock implements ExoBlock{
 
@@ -75,10 +75,11 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 	public function fill(World $world, Vector3 $origin, int $radius, int $direction) : array{
 		$blocks = [];
 
-		$visits = new Queue([$origin]);
+		$visits = new SplQueue();
+		$visits->enqueue($origin);
 		while(!$visits->isEmpty()){
 			/** @var Vector3 $coordinates */
-			$coordinates = $visits->pop();
+			$coordinates = $visits->dequeue();
 			if($origin->distanceSquared($coordinates) >= $this->lengthSquared){
 				return [];
 			}
@@ -95,20 +96,14 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 			){
 				$this->visit($coordinates, $blocks, $direction);
 				if($direction === Facing::WEST){
-					$visits->push(
-						$coordinates->getSide(Facing::NORTH),
-						$coordinates->getSide(Facing::SOUTH)
-					);
+					$visits->enqueue($coordinates->getSide(Facing::NORTH));
+					$visits->enqueue($coordinates->getSide(Facing::SOUTH));
 				}elseif($direction === Facing::NORTH){
-					$visits->push(
-						$coordinates->getSide(Facing::WEST),
-						$coordinates->getSide(Facing::EAST)
-					);
+					$visits->enqueue($coordinates->getSide(Facing::WEST));
+					$visits->enqueue($coordinates->getSide(Facing::EAST));
 				}
-				$visits->push(
-					$coordinates->getSide(Facing::UP),
-					$coordinates->getSide(Facing::DOWN)
-				);
+				$visits->enqueue($coordinates->getSide(Facing::UP));
+				$visits->enqueue($coordinates->getSide(Facing::DOWN));
 			}elseif(!$this->isValid($block, $coordinates_hash, $blocks)){
 				return [];
 			}

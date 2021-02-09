@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace muqsit\dimensionportals\exoblock;
 
-use Ds\Queue;
-
 use muqsit\dimensionportals\world\WorldInstance;
 use muqsit\dimensionportals\world\WorldManager;
 use pocketmine\block\Block;
@@ -19,6 +17,7 @@ use pocketmine\player\Player;
 use pocketmine\world\utils\SubChunkExplorer;
 use pocketmine\world\utils\SubChunkExplorerStatus;
 use pocketmine\world\World;
+use SplQueue;
 
 class NetherPortalExoBlock extends PortalExoBlock{
 
@@ -73,7 +72,8 @@ class NetherPortalExoBlock extends PortalExoBlock{
 	}
 
 	public function fill(World $world, Vector3 $origin, int $metadata) : void{
-		$visits = new Queue([$origin]);
+		$visits = new SplQueue();
+		$visits->enqueue($origin);
 
 		$iterator = new SubChunkExplorer($world);
 		$air = VanillaBlocks::AIR();
@@ -82,7 +82,7 @@ class NetherPortalExoBlock extends PortalExoBlock{
 
 		while(!$visits->isEmpty()){
 			/** @var Vector3 $coordinates */
-			$coordinates = $visits->pop();
+			$coordinates = $visits->dequeue();
 			if(
 				$iterator->moveTo($coordinates->x, $coordinates->y, $coordinates->z) === SubChunkExplorerStatus::INVALID ||
 				$block_factory->fromFullBlock($iterator->currentSubChunk->getFullBlock($coordinates->x & 0x0f, $coordinates->y & 0x0f, $coordinates->z & 0x0f))->getId() !== BlockLegacyIds::PORTAL
@@ -93,21 +93,15 @@ class NetherPortalExoBlock extends PortalExoBlock{
 			$world->setBlockAt($coordinates->x, $coordinates->y, $coordinates->z, $air);
 
 			if($metadata === 0){
-				$visits->push(
-					$coordinates->getSide(Facing::EAST),
-					$coordinates->getSide(Facing::WEST)
-				);
+				$visits->enqueue($coordinates->getSide(Facing::EAST));
+				$visits->enqueue($coordinates->getSide(Facing::WEST));
 			}else{
-				$visits->push(
-					$coordinates->getSide(Facing::NORTH),
-					$coordinates->getSide(Facing::SOUTH)
-				);
+				$visits->enqueue($coordinates->getSide(Facing::NORTH));
+				$visits->enqueue($coordinates->getSide(Facing::SOUTH));
 			}
 
-			$visits->push(
-				$coordinates->getSide(Facing::UP),
-				$coordinates->getSide(Facing::DOWN)
-			);
+			$visits->enqueue($coordinates->getSide(Facing::UP));
+			$visits->enqueue($coordinates->getSide(Facing::DOWN));
 		}
 	}
 }
