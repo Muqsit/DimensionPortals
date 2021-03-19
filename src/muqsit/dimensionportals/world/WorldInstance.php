@@ -8,8 +8,7 @@ use pocketmine\world\World;
 
 abstract class WorldInstance{
 
-	/** @var World */
-	protected $world;
+	protected World $world;
 
 	final public function __construct(World $world){
 		$this->world = $world;

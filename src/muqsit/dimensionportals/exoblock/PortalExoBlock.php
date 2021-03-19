@@ -11,8 +11,7 @@ use pocketmine\player\Player;
 
 abstract class PortalExoBlock implements ExoBlock{
 
-	/** @var int */
-	private $teleportation_duration;
+	private int $teleportation_duration;
 
 	public function __construct(int $teleportation_duration){
 		$this->teleportation_duration = $teleportation_duration;

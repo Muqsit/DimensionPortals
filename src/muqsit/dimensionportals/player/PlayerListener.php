@@ -11,8 +11,7 @@ use pocketmine\event\player\PlayerQuitEvent;
 
 final class PlayerListener implements Listener{
 
-	/** @var Logger */
-	private $logger;
+	private Logger $logger;
 
 	public function __construct(Logger $logger){
 		$this->logger = $logger;

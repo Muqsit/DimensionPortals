@@ -21,8 +21,7 @@ class EndPortalFrameExoBlock implements ExoBlock{
 
 	private const SIDES = [Facing::NORTH, Facing::EAST, Facing::SOUTH, Facing::WEST];
 
-	/** @var ReflectionProperty */
-	private $property_eye;
+	private ReflectionProperty $property_eye;
 
 	public function __construct(){
 		$this->property_eye = new ReflectionProperty(EndPortalFrame::class, "eye");

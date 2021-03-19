@@ -18,17 +18,10 @@ use PrefixedLogger;
 
 final class PlayerInstance{
 
-	/** @var Player */
-	private $player;
-
-	/** @var PlayerPortalInfo|null */
-	private $in_portal;
-
-	/** @var Logger */
-	private $logger;
-
-	/** @var bool */
-	private $changing_dimension = false;
+	private Player $player;
+	private Logger $logger;
+	private ?PlayerPortalInfo $in_portal = null;
+	private bool $changing_dimension = false;
 
 	public function __construct(Player $player, Logger $logger){
 		$this->player = $player;

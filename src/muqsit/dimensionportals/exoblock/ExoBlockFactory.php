@@ -15,7 +15,7 @@ use pocketmine\utils\Config;
 final class ExoBlockFactory{
 
 	/** @var ExoBlock[] */
-	private static $blocks = [];
+	private static array $blocks = [];
 
 	public static function init(Loader $loader) : void{
 		$loader->getServer()->getPluginManager()->registerEvents(new ExoBlockEventHandler(), $loader);

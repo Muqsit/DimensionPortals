@@ -17,11 +17,8 @@ use SplQueue;
 
 class NetherPortalFrameExoBlock implements ExoBlock{
 
-	/** @var int */
-	private $frame_block_id;
-
-	/** @var float */
-	private $lengthSquared;
+	private int $frame_block_id;
+	private float $lengthSquared;
 
 	public function __construct(Block $frame_block, int $max_portal_height, int $max_portal_width){
 		$this->frame_block_id = $frame_block->getId();

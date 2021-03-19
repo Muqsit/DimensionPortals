@@ -21,8 +21,7 @@ use SplQueue;
 
 class NetherPortalExoBlock extends PortalExoBlock{
 
-	/** @var int */
-	private $frame_block_id;
+	private int $frame_block_id;
 
 	public function __construct(int $teleportation_duration, Block $frame_block){
 		parent::__construct($teleportation_duration);

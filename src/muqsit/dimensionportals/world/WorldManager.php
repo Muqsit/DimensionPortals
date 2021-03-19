@@ -19,10 +19,10 @@ final class WorldManager{
 	private const TYPE_END = 2;
 
 	/** @var string[] */
-	private static $types = [];
+	private static array $types = [];
 
 	/** @var WorldHolder[] */
-	private static $worlds = [];
+	private static array $worlds = [];
 
 	public static function init(Loader $plugin) : void{
 		$config = $plugin->getConfig();

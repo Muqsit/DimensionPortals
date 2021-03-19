@@ -19,10 +19,10 @@ use pocketmine\scheduler\ClosureTask;
 final class PlayerManager{
 
 	/** @var PlayerInstance[] */
-	private static $players = [];
+	private static array $players = [];
 
 	/** @var int[] */
-	private static $ticking = [];
+	private static array $ticking = [];
 
 	public static function init(Loader $plugin) : void{
 		$plugin->getServer()->getPluginManager()->registerEvents(new PlayerListener($plugin->getLogger()), $plugin);

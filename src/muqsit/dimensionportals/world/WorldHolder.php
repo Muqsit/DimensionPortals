@@ -9,11 +9,8 @@ use pocketmine\world\World;
 
 final class WorldHolder{
 
-	/** @var string */
-	private $class;
-
-	/** @var WorldInstance */
-	private $instance;
+	private string $class;
+	private WorldInstance $instance;
 
 	public function __construct(string $class){
 		Utils::testValidInstance($class, WorldInstance::class);

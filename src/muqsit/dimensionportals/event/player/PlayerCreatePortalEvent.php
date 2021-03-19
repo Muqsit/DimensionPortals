@@ -14,14 +14,12 @@ use pocketmine\world\Position;
 class PlayerCreatePortalEvent extends DimensionPortalsEvent implements Cancellable{
 	use CancellableTrait;
 
-	/** @var Player */
-	private $player;
+	private Player $player;
 
-	/** @var Position */
-	private $block_pos;
+	private Position $block_pos;
 
 	/** @var Block[] */
-	private $affected_blocks;
+	private array $affected_blocks;
 
 	/**
 	 * @param Player $player
