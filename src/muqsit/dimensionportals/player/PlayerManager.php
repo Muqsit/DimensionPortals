@@ -25,7 +25,7 @@ final class PlayerManager{
 	private static array $ticking = [];
 
 	/** @var true[] */
-	public static $_changing_dimension_sessions = [];
+	public static array $_changing_dimension_sessions = [];
 
 	public static function init(Loader $plugin) : void{
 		$plugin->getServer()->getPluginManager()->registerEvents(new PlayerListener($plugin->getLogger()), $plugin);
