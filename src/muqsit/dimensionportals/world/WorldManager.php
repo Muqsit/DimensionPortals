@@ -10,6 +10,7 @@ use muqsit\dimensionportals\world\nether\NetherWorldInstance;
 use muqsit\dimensionportals\world\overworld\OverworldInstance;
 use pocketmine\Server;
 use pocketmine\world\World;
+use pocketmine\world\WorldCreationOptions;
 use RuntimeException;
 
 final class WorldManager{
@@ -44,7 +45,7 @@ final class WorldManager{
 		self::$worlds[$world_name] = $holder;
 
 		$world_manager = Server::getInstance()->getWorldManager();
-		if(!$world_manager->loadWorld($world_name) && !$world_manager->generateWorld($world_name)){
+		if(!$world_manager->loadWorld($world_name) && !$world_manager->generateWorld($world_name, WorldCreationOptions::create())){
 			throw new RuntimeException("Failed to load world " . $world_name);
 		}
 
