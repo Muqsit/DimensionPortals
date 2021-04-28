@@ -24,6 +24,9 @@ final class PlayerManager{
 	/** @var int[] */
 	private static array $ticking = [];
 
+	/** @var true[] */
+	public static $_changing_dimension_sessions = [];
+
 	public static function init(Loader $plugin) : void{
 		$plugin->getServer()->getPluginManager()->registerEvents(new PlayerListener($plugin->getLogger()), $plugin);
 		$plugin->getServer()->getPluginManager()->registerEvents(new PlayerDimensionChangeListener(), $plugin);
@@ -46,11 +49,7 @@ final class PlayerManager{
 			}
 			return true;
 		})->interceptIncoming(static function(MovePlayerPacket $packet, NetworkSession $origin) : bool{
-			$player = $origin->getPlayer();
-			if($player !== null && $player->isConnected() && PlayerManager::get($player)->isChangingDimension()){
-				return false;
-			}
-			return true;
+			return !isset(self::$_changing_dimension_sessions[spl_object_id($origin)]);
 		});
 
 		SimplePacketHandler::createMonitor($plugin)->monitorIncoming(static function(PlayerActionPacket $packet, NetworkSession $origin) : void{
@@ -93,5 +92,6 @@ final class PlayerManager{
 
 	public static function stopTicking(Player $player) : void{
 		unset(self::$ticking[$player->getId()]);
+		unset(self::$_changing_dimension_sessions[spl_object_id($player->getNetworkSession())]);
 	}
 }

@@ -44,6 +44,7 @@ final class PlayerInstance{
 	public function onBeginDimensionChange(int $network_dimension_id, Vector3 $position, bool $respawn) : void{
 		$session = $this->player->getNetworkSession();
 
+		PlayerManager::$_changing_dimension_sessions[spl_object_id($session)] = true;
 		$this->changing_dimension = true;
 		$packet = new ChangeDimensionPacket();
 		$packet->dimension = $network_dimension_id;
@@ -54,8 +55,10 @@ final class PlayerInstance{
 	}
 
 	public function onEndDimensionChange() : void{
+		$session = $this->player->getNetworkSession();
+		unset(PlayerManager::$_changing_dimension_sessions[spl_object_id($session)]);
 		$this->changing_dimension = false;
-		$this->player->getNetworkSession()->sendDataPacket(PlayStatusPacket::create(PlayStatusPacket::PLAYER_SPAWN));
+		$session->sendDataPacket(PlayStatusPacket::create(PlayStatusPacket::PLAYER_SPAWN));
 		$this->logger->debug("Stopped changing dimension");
 	}
 
