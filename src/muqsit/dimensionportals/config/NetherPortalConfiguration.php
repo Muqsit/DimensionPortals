@@ -10,13 +10,13 @@ final class NetherPortalConfiguration{
 	 * @param array $data
 	 * @return self
 	 *
-	 * @phpstan-param array<string, mixed>
+	 * @phpstan-param array<string, mixed> $data
 	 */
 	public static function fromData(array $data) : self{
 		$instance = new self(
-			ConfigurationHelper::read($data, "frame-block"),
-			ConfigurationHelper::read($data, "max-width"),
-			ConfigurationHelper::read($data, "max-height")
+			ConfigurationHelper::readString($data, "frame-block"),
+			ConfigurationHelper::readInt($data, "max-width", 1),
+			ConfigurationHelper::readInt($data, "max-height", 1)
 		);
 		ConfigurationHelper::checkForUnread($data);
 		return $instance;

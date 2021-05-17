@@ -10,13 +10,13 @@ final class NetherConfiguration{
 	 * @param array $data
 	 * @return self
 	 *
-	 * @phpstan-param array<string, mixed>
+	 * @phpstan-param array<string, mixed> $data
 	 */
 	public static function fromData(array $data) : self{
 		$instance = new self(
-			ConfigurationHelper::read($data, "world"),
-			ConfigurationHelper::read($data, "teleportation-duration"),
-			NetherPortalConfiguration::fromData(ConfigurationHelper::read($data, "portal"))
+			ConfigurationHelper::readString($data, "world"),
+			ConfigurationHelper::readInt($data, "teleportation-duration", 0),
+			NetherPortalConfiguration::fromData(ConfigurationHelper::readMap($data, "portal"))
 		);
 		ConfigurationHelper::checkForUnread($data);
 		return $instance;

@@ -10,10 +10,10 @@ final class EndConfiguration{
 	 * @param array $data
 	 * @return self
 	 *
-	 * @phpstan-param array<string, mixed>
+	 * @phpstan-param array<string, mixed> $data
 	 */
 	public static function fromData(array $data) : self{
-		$instance = new self(ConfigurationHelper::read($data, "world"), ConfigurationHelper::read($data, "teleportation-duration"));
+		$instance = new self(ConfigurationHelper::readString($data, "world"), ConfigurationHelper::readInt($data, "teleportation-duration", 0));
 		ConfigurationHelper::checkForUnread($data);
 		return $instance;
 	}

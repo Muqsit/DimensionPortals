@@ -10,10 +10,12 @@ final class OverworldConfiguration{
 	 * @param array $data
 	 * @return self
 	 *
-	 * @phpstan-param array<string, mixed>
+	 * @phpstan-param array<string, mixed> $data
 	 */
 	public static function fromData(array $data) : self{
-		return new self($data["world"]);
+		$instance = new self(ConfigurationHelper::readString($data, "world"));
+		ConfigurationHelper::checkForUnread($data);
+		return $instance;
 	}
 
 	private string $world;

@@ -10,12 +10,12 @@ final class Configuration{
 	 * @param array $data
 	 * @return self
 	 *
-	 * @phpstan-param array<string, mixed>
+	 * @phpstan-param array<string, mixed> $data
 	 */
 	public static function fromData(array $data) : self{
-		$overworld = OverworldConfiguration::fromData(ConfigurationHelper::read($data, "overworld"));
-		$nether = NetherConfiguration::fromData(ConfigurationHelper::read($data, "nether"));
-		$end = EndConfiguration::fromData(ConfigurationHelper::read($data, "end"));
+		$overworld = OverworldConfiguration::fromData(ConfigurationHelper::readMap($data, "overworld"));
+		$nether = NetherConfiguration::fromData(ConfigurationHelper::readMap($data, "nether"));
+		$end = EndConfiguration::fromData(ConfigurationHelper::readMap($data, "end"));
 		ConfigurationHelper::checkForUnread($data);
 		return new self($overworld, $nether, $end);
 	}
