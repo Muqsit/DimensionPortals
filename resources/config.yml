@@ -15,7 +15,7 @@ nether:
     frame-block: OBSIDIAN
     # Portal dimensions cap
     max-width: 30
-    amx-height: 30
+    max-height: 30
 
 end:
   # Folder name of the world to use for end
