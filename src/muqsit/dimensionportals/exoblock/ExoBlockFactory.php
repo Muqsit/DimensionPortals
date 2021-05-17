@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace muqsit\dimensionportals\exoblock;
 
 use InvalidArgumentException;
+use muqsit\dimensionportals\config\EndConfiguration;
+use muqsit\dimensionportals\config\NetherConfiguration;
 use muqsit\dimensionportals\Loader;
 use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\VanillaBlocks;
-use pocketmine\utils\Config;
 
 final class ExoBlockFactory{
 
@@ -19,31 +20,30 @@ final class ExoBlockFactory{
 
 	public static function init(Loader $loader) : void{
 		$loader->getServer()->getPluginManager()->registerEvents(new ExoBlockEventHandler(), $loader);
-		$config = $loader->getConfig();
-		self::initNether($config);
-		self::initEnd($config);
+		self::initNether($loader->getConfiguration()->getNether());
+		self::initEnd($loader->getConfiguration()->getEnd());
 	}
 
-	private static function initNether(Config $config) : void{
-		$frame_block = VanillaBlocks::fromString((string) $config->getNested("nether.portal.frame-block"));
+	private static function initNether(NetherConfiguration $config) : void{
+		$frame_block = VanillaBlocks::fromString($config->getPortal()->getFrameBlock());
 		if($frame_block->getId() === BlockLegacyIds::AIR){
-			throw new InvalidArgumentException("Invalid nether portal frame block " . $config->get("nether.portal.frame-block"));
+			throw new InvalidArgumentException("Invalid nether portal frame block " . $config->getPortal()->getFrameBlock());
 		}
 
 		self::register(
 			new NetherPortalFrameExoBlock(
 				$frame_block,
-				(int) $config->getNested("nether.portal.max-height"),
-				(int) $config->getNested("nether.portal.max-width")
+				$config->getPortal()->getMaxHeight(),
+				$config->getPortal()->getMaxWidth()
 			),
 			$frame_block
 		);
-		self::register(new NetherPortalExoBlock($config->getNested("nether.teleportation-duration"), $frame_block), VanillaBlocks::NETHER_PORTAL());
+		self::register(new NetherPortalExoBlock($config->getTeleportationDuration(), $frame_block), VanillaBlocks::NETHER_PORTAL());
 	}
 
-	private static function initEnd(Config $config) : void{
+	private static function initEnd(EndConfiguration $config) : void{
 		self::register(new EndPortalFrameExoBlock(), VanillaBlocks::END_PORTAL_FRAME());
-		self::register(new EndPortalExoBlock($config->getNested("end.teleportation-duration")), BlockFactory::getInstance()->get(BlockLegacyIds::END_PORTAL, 0));
+		self::register(new EndPortalExoBlock($config->getTeleportationDuration()), BlockFactory::getInstance()->get(BlockLegacyIds::END_PORTAL, 0));
 	}
 
 	public static function register(ExoBlock $exo_block, Block $block) : void{

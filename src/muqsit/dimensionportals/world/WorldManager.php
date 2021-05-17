@@ -26,11 +26,11 @@ final class WorldManager{
 	private static array $worlds = [];
 
 	public static function init(Loader $plugin) : void{
-		$config = $plugin->getConfig();
+		$config = $plugin->getConfiguration();
 		self::$types = [
-			self::TYPE_OVERWORLD => $config->getNested("overworld.world"),
-			self::TYPE_NETHER => $config->getNested("nether.world"),
-			self::TYPE_END => $config->getNested("end.world")
+			self::TYPE_OVERWORLD => $config->getOverworld()->getWorld(),
+			self::TYPE_NETHER => $config->getNether()->getWorld(),
+			self::TYPE_END => $config->getEnd()->getWorld()
 		];
 
 		self::registerWorldHolder(self::TYPE_OVERWORLD, new WorldHolder(OverworldInstance::class));
