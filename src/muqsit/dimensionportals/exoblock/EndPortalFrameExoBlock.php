@@ -15,28 +15,22 @@ use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\math\Facing;
 use pocketmine\player\Player;
-use ReflectionProperty;
 
 class EndPortalFrameExoBlock implements ExoBlock{
 
 	private const SIDES = [Facing::NORTH, Facing::EAST, Facing::SOUTH, Facing::WEST];
 
-	private ReflectionProperty $property_eye;
-
 	public function __construct(){
-		$this->property_eye = new ReflectionProperty(EndPortalFrame::class, "eye");
-		$this->property_eye->setAccessible(true);
 	}
 
 	public function interact(Block $wrapping, Player $player, Item $item, int $face) : bool{
 		/** @var EndPortalFrame $wrapping */
-		$eyed = $this->property_eye->getValue($wrapping);
-		if(!$eyed){
+		if(!$wrapping->hasEye()){
 			if($item->getId() === ItemIds::ENDER_EYE){
 				($ev = new PlayerCreateEndPortalEvent($player, $wrapping->getPos()))->call();
 				if(!$ev->isCancelled()){
 					$item->pop();
-					$this->property_eye->setValue($wrapping, true);
+					$wrapping->setEye(true);
 					$pos = $wrapping->getPos();
 					$pos->getWorld()->setBlockAt($pos->x, $pos->y, $pos->z, $wrapping, false);
 					$this->tryCreatingPortal($wrapping);
@@ -44,7 +38,7 @@ class EndPortalFrameExoBlock implements ExoBlock{
 				}
 			}
 		}elseif($item->getId() !== ItemIds::ENDER_EYE){
-			$this->property_eye->setValue($wrapping, false);
+			$wrapping->setEye(false);
 			$pos = $wrapping->getPos();
 			$world = $pos->getWorld();
 			$world->setBlockAt($pos->x, $pos->y, $pos->z, $wrapping, false);
@@ -56,7 +50,8 @@ class EndPortalFrameExoBlock implements ExoBlock{
 	}
 
 	public function update(Block $wrapping) : bool{
-		if($this->property_eye->getValue($wrapping)){
+		/** @var EndPortalFrame $wrapping */
+		if($wrapping->hasEye()){
 			$this->tryDestroyingPortal($wrapping);
 		}
 		return false;
@@ -72,7 +67,7 @@ class EndPortalFrameExoBlock implements ExoBlock{
 		for($i = 0; $i < 4; ++$i){
 			for($j = -1; $j <= 1; ++$j){
 				$block = $center->getSide(self::SIDES[$i], 2)->getSide(self::SIDES[($i + 1) % 4], $j);
-				if(!($block instanceof EndPortalFrame) || !$this->property_eye->getValue($block)){
+				if(!($block instanceof EndPortalFrame) || !$block->hasEye()){
 					return false;
 				}
 			}
