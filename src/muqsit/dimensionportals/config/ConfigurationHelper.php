@@ -12,9 +12,8 @@ final class ConfigurationHelper{
 	 * @return mixed
 	 *
 	 * @phpstan-param array<string, mixed> $data
-	 * @phpstan-return mixed
 	 */
-	public static function read(array &$data, string $key){
+	public static function read(array &$data, string $key) : mixed{
 		if(!isset($data[$key])){
 			throw new BadConfigurationException("Cannot find required key '{$key}'");
 		}

@@ -12,9 +12,9 @@ final class ArrayUtils{
 	 * @param mixed[] $array
 	 * @param Closure $condition
 	 * @param mixed|null $fallback
-	 * @return mixed|null
+	 * @return mixed
 	 */
-	public static function firstOrDefault(array $array, Closure $condition, $fallback = null){
+	public static function firstOrDefault(array $array, Closure $condition, mixed $fallback = null) : mixed{
 		foreach($array as $index => $element){
 			if($condition($index, $element)){
 				return $element;

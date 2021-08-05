@@ -10,7 +10,6 @@ use pocketmine\event\Listener;
 use pocketmine\event\world\ChunkLoadEvent;
 use pocketmine\event\world\ChunkUnloadEvent;
 use pocketmine\event\world\WorldUnloadEvent;
-use pocketmine\network\mcpe\protocol\ChangeDimensionPacket;
 use pocketmine\player\Player;
 
 final class WorldListener implements Listener{
