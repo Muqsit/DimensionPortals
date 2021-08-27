@@ -30,13 +30,13 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 			$affectedBlock = $wrapping->getSide($face);
 			if($affectedBlock->getId() === BlockLegacyIds::AIR){
 				$world = $player->getWorld();
-				$pos = $affectedBlock->getPos()->asVector3();
+				$pos = $affectedBlock->getPosition()->asVector3();
 				$blocks = $this->fill($world, $pos, 10, Facing::WEST);
 				if(count($blocks) === 0){
 					$blocks = $this->fill($world, $pos, 10, Facing::NORTH);
 				}
 				if(count($blocks) > 0){
-					($ev = new PlayerCreateNetherPortalEvent($player, $wrapping->getPos()))->call();
+					($ev = new PlayerCreateNetherPortalEvent($player, $wrapping->getPosition()))->call();
 					if(!$ev->isCancelled()){
 						foreach($blocks as $hash => $block){
 							if($block->getId() === BlockLegacyIds::PORTAL){

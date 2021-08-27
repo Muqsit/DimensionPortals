@@ -27,11 +27,11 @@ class EndPortalFrameExoBlock implements ExoBlock{
 		/** @var EndPortalFrame $wrapping */
 		if(!$wrapping->hasEye()){
 			if($item->getId() === ItemIds::ENDER_EYE){
-				($ev = new PlayerCreateEndPortalEvent($player, $wrapping->getPos()))->call();
+				($ev = new PlayerCreateEndPortalEvent($player, $wrapping->getPosition()))->call();
 				if(!$ev->isCancelled()){
 					$item->pop();
 					$wrapping->setEye(true);
-					$pos = $wrapping->getPos();
+					$pos = $wrapping->getPosition();
 					$pos->getWorld()->setBlockAt($pos->x, $pos->y, $pos->z, $wrapping, false);
 					$this->tryCreatingPortal($wrapping);
 					return true;
@@ -39,7 +39,7 @@ class EndPortalFrameExoBlock implements ExoBlock{
 			}
 		}elseif($item->getId() !== ItemIds::ENDER_EYE){
 			$wrapping->setEye(false);
-			$pos = $wrapping->getPos();
+			$pos = $wrapping->getPosition();
 			$world = $pos->getWorld();
 			$world->setBlockAt($pos->x, $pos->y, $pos->z, $wrapping, false);
 			$world->dropItem($pos->add(0.5, 0.75, 0.5), ItemFactory::getInstance()->get(ItemIds::ENDER_EYE));
@@ -88,7 +88,7 @@ class EndPortalFrameExoBlock implements ExoBlock{
 	}
 
 	public function createPortal(Block $center) : void{
-		$pos = $center->getPos();
+		$pos = $center->getPosition();
 		$world = $pos->getWorld();
 		$block_factory = BlockFactory::getInstance();
 		for($i = -1; $i <= 1; ++$i){
@@ -110,7 +110,7 @@ class EndPortalFrameExoBlock implements ExoBlock{
 	}
 
 	public function destroyPortal(Block $center) : void{
-		$pos = $center->getPos();
+		$pos = $center->getPosition();
 		$world = $pos->getWorld();
 		for($i = -1; $i <= 1; ++$i){
 			for($j = -1; $j <= 1; ++$j){
