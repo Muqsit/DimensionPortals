@@ -12,6 +12,7 @@ use pocketmine\block\Block;
 use pocketmine\block\BlockFactory;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\VanillaBlocks;
+use pocketmine\item\StringToItemParser;
 
 final class ExoBlockFactory{
 
@@ -25,7 +26,7 @@ final class ExoBlockFactory{
 	}
 
 	private static function initNether(NetherConfiguration $config) : void{
-		$frame_block = VanillaBlocks::fromString($config->getPortal()->getFrameBlock());
+		$frame_block = StringToItemParser::getInstance()->parse($config->getPortal()->getFrameBlock())->getBlock();
 		if($frame_block->getId() === BlockLegacyIds::AIR){
 			throw new InvalidArgumentException("Invalid nether portal frame block " . $config->getPortal()->getFrameBlock());
 		}
