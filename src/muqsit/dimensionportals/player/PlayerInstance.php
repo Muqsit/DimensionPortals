@@ -46,19 +46,20 @@ final class PlayerInstance{
 
 		PlayerManager::$_changing_dimension_sessions[spl_object_id($session)] = true;
 		$this->changing_dimension = true;
-		$packet = new ChangeDimensionPacket();
-		$packet->dimension = $network_dimension_id;
-		$packet->position = $position;
-		$packet->respawn = $respawn;
-		$session->sendDataPacket($packet);
+		// $packet = new ChangeDimensionPacket();
+		// $packet->dimension = $network_dimension_id;
+		// $packet->position = $position;
+		// $packet->respawn = $respawn;
+		// $session->sendDataPacket($packet);
 		$this->logger->debug("Started changing dimension (network_dimension_id: {$network_dimension_id}, position: {$position->asVector3()}, respawn: " . ($respawn ? "true" : "false") . ")");
+		$this->onEndDimensionChange();
 	}
 
 	public function onEndDimensionChange() : void{
 		$session = $this->player->getNetworkSession();
 		unset(PlayerManager::$_changing_dimension_sessions[spl_object_id($session)]);
 		$this->changing_dimension = false;
-		$session->sendDataPacket(PlayStatusPacket::create(PlayStatusPacket::PLAYER_SPAWN));
+		// $session->sendDataPacket(PlayStatusPacket::create(PlayStatusPacket::PLAYER_SPAWN));
 		$this->logger->debug("Stopped changing dimension");
 	}
 

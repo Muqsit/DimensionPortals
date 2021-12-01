@@ -9,11 +9,9 @@ use muqsit\dimensionportals\Loader;
 use muqsit\dimensionportals\world\WorldManager;
 use muqsit\simplepackethandler\SimplePacketHandler;
 use pocketmine\network\mcpe\NetworkSession;
-use pocketmine\network\mcpe\protocol\LevelEventPacket;
 use pocketmine\network\mcpe\protocol\MovePlayerPacket;
 use pocketmine\network\mcpe\protocol\PlayerActionPacket;
 use pocketmine\network\mcpe\protocol\StartGamePacket;
-use pocketmine\network\mcpe\protocol\types\LevelSettings;
 use pocketmine\network\mcpe\protocol\types\PlayerAction;
 use pocketmine\network\mcpe\protocol\types\SpawnSettings;
 use pocketmine\player\Player;
@@ -34,12 +32,10 @@ final class PlayerManager{
 		$plugin->getServer()->getPluginManager()->registerEvents(new PlayerListener($plugin->getLogger()), $plugin);
 		$plugin->getServer()->getPluginManager()->registerEvents(new PlayerDimensionChangeListener(), $plugin);
 
-		SimplePacketHandler::createInterceptor($plugin)->interceptOutgoing(static function(StartGamePacket $packet, NetworkSession $target) : bool{
-			/** @noinspection NullPointerExceptionInspection */
+		SimplePacketHandler::createInterceptor($plugin)/*->interceptOutgoing(static function(StartGamePacket $packet, NetworkSession $target) : bool{
 			$world = WorldManager::get($target->getPlayer()->getWorld());
 			if($world !== null){
 				$dimensionId = $world->getNetworkDimensionId();
-
 				if($dimensionId !== $packet->levelSettings->spawnSettings->getDimension()){
 					$pk = clone $packet;
 					$pk->levelSettings->spawnSettings = new SpawnSettings(
@@ -52,7 +48,7 @@ final class PlayerManager{
 				}
 			}
 			return true;
-		})->interceptIncoming(static function(MovePlayerPacket $packet, NetworkSession $origin) : bool{
+		})*/->interceptIncoming(static function(MovePlayerPacket $packet, NetworkSession $origin) : bool{
 			return !isset(self::$_changing_dimension_sessions[spl_object_id($origin)]);
 		});
 
