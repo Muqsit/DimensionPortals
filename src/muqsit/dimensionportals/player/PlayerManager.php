@@ -32,7 +32,7 @@ final class PlayerManager{
 		$plugin->getServer()->getPluginManager()->registerEvents(new PlayerListener($plugin->getLogger()), $plugin);
 		$plugin->getServer()->getPluginManager()->registerEvents(new PlayerDimensionChangeListener(), $plugin);
 
-		SimplePacketHandler::createInterceptor($plugin)/*->interceptOutgoing(static function(StartGamePacket $packet, NetworkSession $target) : bool{
+		SimplePacketHandler::createInterceptor($plugin)->interceptOutgoing(static function(StartGamePacket $packet, NetworkSession $target) : bool{
 			$world = WorldManager::get($target->getPlayer()->getWorld());
 			if($world !== null){
 				$dimensionId = $world->getNetworkDimensionId();
@@ -48,7 +48,7 @@ final class PlayerManager{
 				}
 			}
 			return true;
-		})*/->interceptIncoming(static function(MovePlayerPacket $packet, NetworkSession $origin) : bool{
+		})->interceptIncoming(static function(MovePlayerPacket $packet, NetworkSession $origin) : bool{
 			return !isset(self::$_changing_dimension_sessions[spl_object_id($origin)]);
 		});
 
