@@ -50,14 +50,12 @@ final class ExoBlockEventHandler implements Listener{
 
 		if(!$from_f->equals($to_f)){
 			$player = $event->getPlayer();
+
 			$from_block = ExoBlockFactory::get($block = $from->world->getBlockAt($from_f->x, $from_f->y, $from_f->z));
-			if($from_block !== null){
-				$from_block->onPlayerMoveOutside($player, $block);
-			}
+			$from_block?->onPlayerMoveOutside($player, $block);
+
 			$to_block = ExoBlockFactory::get($block = $to->world->getBlockAt($to_f->x, $to_f->y, $to_f->z));
-			if($to_block !== null){
-				$to_block->onPlayerMoveInside($player, $block);
-			}
+			$to_block?->onPlayerMoveInside($player, $block);
 		}
 	}
 }
