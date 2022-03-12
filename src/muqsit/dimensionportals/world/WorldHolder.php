@@ -9,12 +9,18 @@ use pocketmine\world\World;
 
 final class WorldHolder{
 
-	private string $class;
 	private WorldInstance $instance;
 
-	public function __construct(string $class){
-		Utils::testValidInstance($class, WorldInstance::class);
-		$this->class = $class;
+	/**
+	 * @param string $class
+	 *
+	 * @phpstan-template TWorldInstance of WorldInstance
+	 * @phpstan-param class-string<TWorldInstance> $class
+	 */
+	public function __construct(
+		private string $class
+	){
+		Utils::testValidInstance($this->class, WorldInstance::class);
 	}
 
 	public function create(World $world) : void{

@@ -18,11 +18,9 @@ final class OverworldConfiguration{
 		return $instance;
 	}
 
-	private string $world;
-
-	public function __construct(string $world){
-		$this->world = $world;
-	}
+	public function __construct(
+		private string $world
+	){}
 
 	public function getWorld() : string{
 		return $this->world;

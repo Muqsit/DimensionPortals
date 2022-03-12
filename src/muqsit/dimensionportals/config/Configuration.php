@@ -20,15 +20,11 @@ final class Configuration{
 		return new self($overworld, $nether, $end);
 	}
 
-	private OverworldConfiguration $overworld;
-	private NetherConfiguration $nether;
-	private EndConfiguration $end;
-
-	public function __construct(OverworldConfiguration $overworld, NetherConfiguration $nether, EndConfiguration $end){
-		$this->overworld = $overworld;
-		$this->nether = $nether;
-		$this->end = $end;
-	}
+	public function __construct(
+		private OverworldConfiguration $overworld,
+		private NetherConfiguration $nether,
+		private EndConfiguration $end
+	){}
 
 	public function getOverworld() : OverworldConfiguration{
 		return $this->overworld;

@@ -22,15 +22,11 @@ final class NetherPortalConfiguration{
 		return $instance;
 	}
 
-	private string $frame_block;
-	private int $max_width;
-	private int $max_height;
-
-	public function __construct(string $frame_block, int $max_width, int $max_height){
-		$this->frame_block = $frame_block;
-		$this->max_width = $max_width;
-		$this->max_height = $max_height;
-	}
+	public function __construct(
+		private string $frame_block,
+		private int $max_width,
+		private int $max_height
+	){}
 
 	public function getFrameBlock() : string{
 		return $this->frame_block;

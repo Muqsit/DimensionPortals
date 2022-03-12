@@ -8,14 +8,12 @@ use muqsit\dimensionportals\exoblock\PortalExoBlock;
 
 final class PlayerPortalInfo{
 
-	private PortalExoBlock $block;
-	private int $max_duration;
 	private int $duration = 0;
 
-	public function __construct(PortalExoBlock $block, int $max_duration){
-		$this->block = $block;
-		$this->max_duration = $max_duration;
-	}
+	public function __construct(
+		private PortalExoBlock $block,
+		private int $max_duration
+	){}
 
 	public function getBlock() : PortalExoBlock{
 		return $this->block;
