@@ -26,6 +26,22 @@ final class ConfigurationHelper{
 	/**
 	 * @param mixed[] $data
 	 * @param string $key
+	 * @param mixed $fallback
+	 * @return mixed
+	 *
+	 * @phpstan-param array<string, mixed> $data
+	 */
+	public static function readOptional(array &$data, string $key, mixed $fallback) : mixed{
+		try{
+			return self::read($data, $key);
+		}catch(BadConfigurationException){
+			return $fallback;
+		}
+	}
+
+	/**
+	 * @param mixed[] $data
+	 * @param string $key
 	 * @param int $min
 	 * @param int $max
 	 * @return int

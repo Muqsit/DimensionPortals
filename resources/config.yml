@@ -7,6 +7,9 @@ overworld:
 nether:
   # Folder name of the world to use for nether
   world: nether
+  # A list of other nether dimension worlds. These worlds will exhibit
+  # properties of nether dimension, but won't be used for portal teleportation.
+  sub-worlds: []
   # The number of ticks the player must wait in portal
   # before they get teleported to the nether.
   teleportation-duration: 80
@@ -20,6 +23,9 @@ nether:
 end:
   # Folder name of the world to use for end
   world: end
+  # A list of other end dimension worlds. These worlds will exhibit
+  # properties of end dimension, but won't be used for portal teleportation.
+  sub-worlds: []
   # The number of ticks the player must wait in portal
   # before they get teleported to the end.
   teleportation-duration: 0

@@ -15,6 +15,7 @@ final class NetherConfiguration{
 	public static function fromData(array $data) : self{
 		$instance = new self(
 			ConfigurationHelper::readString($data, "world"),
+			ConfigurationHelper::readOptional($data, "sub-worlds", []),
 			ConfigurationHelper::readInt($data, "teleportation-duration", 0),
 			NetherPortalConfiguration::fromData(ConfigurationHelper::readMap($data, "portal"))
 		);
@@ -22,18 +23,28 @@ final class NetherConfiguration{
 		return $instance;
 	}
 
-	private string $world;
-	private int $teleportation_duration;
-	private NetherPortalConfiguration $portal;
-
-	public function __construct(string $world, int $teleportation_duration, NetherPortalConfiguration $portal){
-		$this->world = $world;
-		$this->teleportation_duration = $teleportation_duration;
-		$this->portal = $portal;
-	}
+	/**
+	 * @param string $world
+	 * @param string[] $sub_worlds
+	 * @param int $teleportation_duration
+	 * @param NetherPortalConfiguration $portal
+	 */
+	public function __construct(
+		private string $world,
+		private array $sub_worlds,
+		private int $teleportation_duration,
+		private NetherPortalConfiguration $portal
+	){}
 
 	public function getWorld() : string{
 		return $this->world;
+	}
+
+	/**
+	 * @return string[]
+	 */
+	public function getSubWorlds() : array{
+		return $this->sub_worlds;
 	}
 
 	public function getTeleportationDuration() : int{

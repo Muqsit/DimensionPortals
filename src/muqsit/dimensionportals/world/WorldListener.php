@@ -9,10 +9,28 @@ use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\world\ChunkLoadEvent;
 use pocketmine\event\world\ChunkUnloadEvent;
+use pocketmine\event\world\WorldLoadEvent;
 use pocketmine\event\world\WorldUnloadEvent;
 use pocketmine\player\Player;
+use pocketmine\Server;
 
 final class WorldListener implements Listener{
+
+	public function __construct(){
+		foreach(Server::getInstance()->getWorldManager()->getWorlds() as $world){
+			if(WorldManager::get($world) === null){
+				WorldManager::autoRegister($world);
+			}
+		}
+	}
+
+	/**
+	 * @param WorldLoadEvent $event
+	 * @priority MONITOR
+	 */
+	public function onWorldLoad(WorldLoadEvent $event) : void{
+		WorldManager::autoRegister($event->getWorld());
+	}
 
 	/**
 	 * @param WorldUnloadEvent $event
