@@ -75,7 +75,8 @@ final class WorldListener implements Listener{
 			$to = $event->getTo();
 			$to_world = WorldManager::get($to->getWorld()) ?? WorldManager::getOverworld();
 			if($from_world->getNetworkDimensionId() !== $to_world->getNetworkDimensionId()){
-				PlayerManager::get($player)->onBeginDimensionChange($to_world->getNetworkDimensionId(), $to->asVector3(), !$player->isAlive());
+				// Player can be null if a plugin teleports the player before PlayerLoginEvent @ MONITOR
+				PlayerManager::getNullable($player)?->onBeginDimensionChange($to_world->getNetworkDimensionId(), $to->asVector3(), !$player->isAlive());
 			}
 		}
 	}
