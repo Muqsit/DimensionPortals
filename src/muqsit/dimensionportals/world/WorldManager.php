@@ -13,6 +13,7 @@ use pocketmine\Server;
 use pocketmine\world\World;
 use pocketmine\world\WorldCreationOptions;
 use RuntimeException;
+use function assert;
 
 final class WorldManager{
 
@@ -40,27 +41,43 @@ final class WorldManager{
 			self::TYPE_END => $config->getEnd()->getWorld()
 		];
 
-		self::$world_types[$config->getOverworld()->getWorld()] = self::TYPE_OVERWORLD;
-		self::$world_types[$config->getNether()->getWorld()] = self::TYPE_NETHER;
-		self::$world_types[$config->getEnd()->getWorld()] = self::TYPE_END;
-
-		foreach($config->getNether()->getSubWorlds() as $sub_world){
-			if(isset(self::$world_types[$sub_world]) && self::$world_types[$sub_world] !== self::TYPE_NETHER){
-				throw new RuntimeException("Tried overriding sub-world {$sub_world}'s dimension from " . self::$world_types[$sub_world] . " to " . self::TYPE_NETHER);
-			}
-			self::$world_types[$sub_world] = self::TYPE_NETHER;
-		}
-
-		foreach($config->getEnd()->getSubWorlds() as $sub_world){
-			if(isset(self::$world_types[$sub_world]) && self::$world_types[$sub_world] !== self::TYPE_END){
-				throw new RuntimeException("Tried overriding sub-world {$sub_world}'s dimension from " . self::$world_types[$sub_world] . " to " . self::TYPE_END);
-			}
-			self::$world_types[$sub_world] = self::TYPE_END;
-		}
-
 		self::registerWorldHolder(self::TYPE_OVERWORLD, new WorldHolder(OverworldInstance::class));
 		self::registerWorldHolder(self::TYPE_NETHER, new WorldHolder(NetherWorldInstance::class));
 		self::registerWorldHolder(self::TYPE_END, new WorldHolder(EndWorldInstance::class));
+
+		$dimension_fix = $plugin->getServer()->getPluginManager()->getPlugin("DimensionFix");
+		assert($dimension_fix === null || $dimension_fix instanceof \muqsit\dimensionfix\Loader);
+
+		/**
+		 * @param string $world
+		 * @param self::TYPE_* $type
+		 */
+		$register_world_type = static function(string $world, int $type) use($dimension_fix) : void{
+			if(isset(self::$world_types[$world]) && self::$world_types[$world] !== $type){
+				throw new RuntimeException("Tried overriding sub-world {$world}'s dimension from " . self::$world_types[$world] . " to " . $type);
+			}
+
+			self::$world_types[$world] = $type;
+
+			if($type !== self::TYPE_OVERWORLD){
+				$dimension_fix?->applyToWorld($world, match ($type) {
+					self::TYPE_NETHER => DimensionIds::NETHER,
+					self::TYPE_END => DimensionIds::THE_END
+				});
+			}
+		};
+
+		$register_world_type($config->getOverworld()->getWorld(), self::TYPE_OVERWORLD);
+		$register_world_type($config->getNether()->getWorld(), self::TYPE_NETHER);
+		$register_world_type($config->getEnd()->getWorld(), self::TYPE_END);
+
+		foreach($config->getNether()->getSubWorlds() as $sub_world){
+			$register_world_type($sub_world, self::TYPE_NETHER);
+		}
+
+		foreach($config->getEnd()->getSubWorlds() as $sub_world){
+			$register_world_type($sub_world, self::TYPE_END);
+		}
 
 		$plugin->getServer()->getPluginManager()->registerEvents(new WorldListener(), $plugin);
 	}
