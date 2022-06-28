@@ -60,7 +60,8 @@ final class WorldManager{
 			self::$world_types[$world] = $type;
 
 			if($type !== self::TYPE_OVERWORLD){
-				$dimension_fix?->applyToWorld($world, match ($type) {
+				/** @var self::TYPE_NETHER|self::TYPE_END $type */
+				$dimension_fix?->applyToWorld($world, match($type){
 					self::TYPE_NETHER => DimensionIds::NETHER,
 					self::TYPE_END => DimensionIds::THE_END
 				});

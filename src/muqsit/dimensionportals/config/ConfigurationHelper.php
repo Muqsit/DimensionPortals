@@ -7,11 +7,9 @@ namespace muqsit\dimensionportals\config;
 final class ConfigurationHelper{
 
 	/**
-	 * @param mixed[] $data
+	 * @param array<string, mixed> $data
 	 * @param string $key
 	 * @return mixed
-	 *
-	 * @phpstan-param array<string, mixed> $data
 	 */
 	public static function read(array &$data, string $key) : mixed{
 		if(!isset($data[$key])){
@@ -24,12 +22,10 @@ final class ConfigurationHelper{
 	}
 
 	/**
-	 * @param mixed[] $data
+	 * @param array<string, mixed> $data
 	 * @param string $key
 	 * @param mixed $fallback
 	 * @return mixed
-	 *
-	 * @phpstan-param array<string, mixed> $data
 	 */
 	public static function readOptional(array &$data, string $key, mixed $fallback) : mixed{
 		try{
@@ -40,13 +36,11 @@ final class ConfigurationHelper{
 	}
 
 	/**
-	 * @param mixed[] $data
+	 * @param array<string, mixed> $data
 	 * @param string $key
 	 * @param int $min
 	 * @param int $max
 	 * @return int
-	 *
-	 * @phpstan-param array<string, mixed> $data
 	 */
 	public static function readInt(array &$data, string $key, int $min = PHP_INT_MIN, int $max = PHP_INT_MAX) : int{
 		$value = self::read($data, $key);
@@ -62,11 +56,9 @@ final class ConfigurationHelper{
 	}
 
 	/**
-	 * @param mixed[] $data
+	 * @param array<string, mixed> $data
 	 * @param string $key
 	 * @return string
-	 *
-	 * @phpstan-param array<string, mixed> $data
 	 */
 	public static function readString(array &$data, string $key) : string{
 		$value = self::read($data, $key);
@@ -78,12 +70,9 @@ final class ConfigurationHelper{
 	}
 
 	/**
-	 * @param mixed[] $data
+	 * @param array<string, mixed> $data
 	 * @param string $key
-	 * @return mixed[]
-	 *
-	 * @phpstan-param array<string, mixed> $data
-	 * @phpstan-return array<string, mixed>
+	 * @return array<string, mixed>
 	 */
 	public static function readMap(array &$data, string $key) : array{
 		$value = self::read($data, $key);
@@ -91,7 +80,7 @@ final class ConfigurationHelper{
 			throw new BadConfigurationException("Expected value of key '{$key}' to be a map, got " . gettype($value) . (is_scalar($value) ? " ({$value})" : ""));
 		}
 
-		/** @phpstan-var array<string, mixed> $value */
+		/** @var array<string, mixed> $value */
 		return $value;
 	}
 

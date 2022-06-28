@@ -7,10 +7,8 @@ namespace muqsit\dimensionportals\config;
 final class NetherPortalConfiguration{
 
 	/**
-	 * @param array $data
+	 * @param array<string, mixed> $data
 	 * @return self
-	 *
-	 * @phpstan-param array<string, mixed> $data
 	 */
 	public static function fromData(array $data) : self{
 		$instance = new self(

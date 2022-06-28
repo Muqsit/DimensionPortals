@@ -12,10 +12,8 @@ final class WorldHolder{
 	private WorldInstance $instance;
 
 	/**
-	 * @param string $class
-	 *
-	 * @phpstan-template TWorldInstance of WorldInstance
-	 * @phpstan-param class-string<TWorldInstance> $class
+	 * @template TWorldInstance of WorldInstance
+	 * @param class-string<TWorldInstance> $class
 	 */
 	public function __construct(
 		private string $class
