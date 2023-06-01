@@ -7,11 +7,14 @@ namespace muqsit\dimensionportals\exoblock;
 use muqsit\dimensionportals\event\player\PlayerCreateNetherPortalEvent;
 use muqsit\dimensionportals\utils\ArrayUtils;
 use pocketmine\block\Block;
-use pocketmine\block\BlockFactory;use pocketmine\block\BlockLegacyIds;
+use pocketmine\block\BlockTypeIds;
+use pocketmine\block\VanillaBlocks;
 use pocketmine\item\Item;
-use pocketmine\item\ItemIds;
+use pocketmine\item\ItemTypeIds;
 use pocketmine\math\Facing;
-use pocketmine\math\Vector2;use pocketmine\math\Vector3;use pocketmine\player\Player;
+use pocketmine\math\Vector2;
+use pocketmine\math\Vector3;
+use pocketmine\player\Player;
 use pocketmine\world\World;
 use SplQueue;
 
@@ -21,14 +24,14 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 	private float $lengthSquared;
 
 	public function __construct(Block $frame_block, int $max_portal_height, int $max_portal_width){
-		$this->frame_block_id = $frame_block->getId();
+		$this->frame_block_id = $frame_block->getTypeId();
 		$this->lengthSquared = (new Vector2($max_portal_height, $max_portal_width))->lengthSquared();
 	}
 
 	public function interact(Block $wrapping, Player $player, Item $item, int $face) : bool{
-		if($item->getId() === ItemIds::FLINT_AND_STEEL){
+		if($item->getTypeId() === ItemTypeIds::FLINT_AND_STEEL){
 			$affectedBlock = $wrapping->getSide($face);
-			if($affectedBlock->getId() === BlockLegacyIds::AIR){
+			if($affectedBlock->getTypeId() === BlockTypeIds::AIR){
 				$world = $player->getWorld();
 				$pos = $affectedBlock->getPosition()->asVector3();
 				$blocks = $this->fill($world, $pos, 10, Facing::WEST);
@@ -39,7 +42,7 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 					($ev = new PlayerCreateNetherPortalEvent($player, $wrapping->getPosition()))->call();
 					if(!$ev->isCancelled()){
 						foreach($blocks as $hash => $block){
-							if($block->getId() === BlockLegacyIds::PORTAL){
+							if($block->getTypeId() === BlockTypeIds::NETHER_PORTAL){
 								World::getBlockXYZ($hash, $x, $y, $z);
 								$world->setBlockAt($x, $y, $z, $block, false);
 							}
@@ -85,7 +88,7 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 			$block = $world->getBlockAt($coordinates->x, $coordinates->y, $coordinates->z);
 
 			if(
-				$block->getId() === BlockLegacyIds::AIR &&
+				$block->getTypeId() === BlockTypeIds::AIR &&
 				ArrayUtils::firstOrDefault(
 					$blocks,
 					static function(int $hash, Block $block) use($coordinates_hash) : bool{ return $hash === $coordinates_hash; }
@@ -115,7 +118,8 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 	 * @param int $direction
 	 */
 	public function visit(Vector3 $coordinates, array &$blocks, int $direction) : void{
-		$blocks[World::blockHash($coordinates->x, $coordinates->y, $coordinates->z)] = BlockFactory::getInstance()->get(BlockLegacyIds::PORTAL, $direction - 2);
+		$axis = Facing::axis(Facing::rotateY($direction, true));
+		$blocks[World::blockHash($coordinates->x, $coordinates->y, $coordinates->z)] = VanillaBlocks::NETHER_PORTAL()->setAxis($axis);
 	}
 
 	/**
@@ -125,10 +129,10 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 	 * @return bool
 	 */
 	private function isValid(Block $block, int $coordinates_hash, array $portals) : bool{
-		return $block->getId() === $this->frame_block_id ||
+		return $block->getTypeId() === $this->frame_block_id ||
 			ArrayUtils::firstOrDefault(
 				$portals,
-				static function(int $hash, Block $b) use($coordinates_hash) : bool{ return $hash === $coordinates_hash && $b->getId() === BlockLegacyIds::PORTAL; }
+				static function(int $hash, Block $b) use($coordinates_hash) : bool{ return $hash === $coordinates_hash && $b->getTypeId() === BlockTypeIds::NETHER_PORTAL; }
 			) !== null;
 	}
 }

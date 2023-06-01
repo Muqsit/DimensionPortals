@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace muqsit\dimensionportals\event\player;
 
 use muqsit\dimensionportals\event\DimensionPortalsEvent;
-use pocketmine\block\Block;
 use pocketmine\event\Cancellable;
 use pocketmine\event\CancellableTrait;
 use pocketmine\player\Player;

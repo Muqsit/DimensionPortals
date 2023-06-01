@@ -7,8 +7,9 @@ namespace muqsit\dimensionportals\exoblock;
 use muqsit\dimensionportals\world\WorldInstance;
 use muqsit\dimensionportals\world\WorldManager;
 use pocketmine\block\Block;
-use pocketmine\block\BlockFactory;
-use pocketmine\block\BlockLegacyIds;
+use pocketmine\block\BlockTypeIds;
+use pocketmine\block\NetherPortal;
+use pocketmine\block\RuntimeBlockStateRegistry;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\item\Item;
 use pocketmine\math\Facing;
@@ -19,6 +20,7 @@ use pocketmine\world\utils\SubChunkExplorer;
 use pocketmine\world\utils\SubChunkExplorerStatus;
 use pocketmine\world\World;
 use SplQueue;
+use function assert;
 
 class NetherPortalExoBlock extends PortalExoBlock{
 
@@ -26,7 +28,7 @@ class NetherPortalExoBlock extends PortalExoBlock{
 
 	public function __construct(int $teleportation_duration, Block $frame_block){
 		parent::__construct($teleportation_duration);
-		$this->frame_block_id = $frame_block->getId();
+		$this->frame_block_id = $frame_block->getTypeId();
 	}
 
 	public function getTargetWorldInstance() : WorldInstance{
@@ -34,6 +36,8 @@ class NetherPortalExoBlock extends PortalExoBlock{
 	}
 
 	public function update(Block $wrapping) : bool{
+		assert($wrapping instanceof NetherPortal);
+
 		$pos = $wrapping->getPosition();
 		$world = $pos->getWorld();
 
@@ -45,7 +49,7 @@ class NetherPortalExoBlock extends PortalExoBlock{
 			$shouldKeep &= $this->isValid($world->getBlockAt($pos->x, $pos->y - 1, $pos->z));
 		}
 
-		$metadata = $wrapping->getMeta();
+		$metadata = $wrapping->getAxis();
 		if($metadata < 2){
 			$shouldKeep &= $this->isValid($world->getBlockAt($pos->x - 1, $pos->y, $pos->z));
 			$shouldKeep &= $this->isValid($world->getBlockAt($pos->x + 1, $pos->y, $pos->z));
@@ -67,8 +71,8 @@ class NetherPortalExoBlock extends PortalExoBlock{
 	}
 
 	public function isValid(Block $block) : bool{
-		$blockId = $block->getId();
-		return $blockId === $this->frame_block_id || $blockId === BlockLegacyIds::PORTAL;
+		$blockId = $block->getTypeId();
+		return $blockId === $this->frame_block_id || $blockId === BlockTypeIds::NETHER_PORTAL;
 	}
 
 	public function fill(World $world, Vector3 $origin, int $metadata) : void{
@@ -78,14 +82,14 @@ class NetherPortalExoBlock extends PortalExoBlock{
 		$iterator = new SubChunkExplorer($world);
 		$air = VanillaBlocks::AIR();
 
-		$block_factory = BlockFactory::getInstance();
+		$block_state_registry = RuntimeBlockStateRegistry::getInstance();
 
 		while(!$visits->isEmpty()){
 			/** @var Vector3 $coordinates */
 			$coordinates = $visits->dequeue();
 			if(
 				$iterator->moveTo($coordinates->x, $coordinates->y, $coordinates->z) === SubChunkExplorerStatus::INVALID ||
-				$block_factory->fromFullBlock($iterator->currentSubChunk->getFullBlock($coordinates->x & Chunk::COORD_MASK, $coordinates->y & Chunk::COORD_MASK, $coordinates->z & Chunk::COORD_MASK))->getId() !== BlockLegacyIds::PORTAL
+				$block_state_registry->fromStateId($iterator->currentSubChunk->getBlockStateId($coordinates->x & Chunk::COORD_MASK, $coordinates->y & Chunk::COORD_MASK, $coordinates->z & Chunk::COORD_MASK))->getTypeId() !== BlockTypeIds::NETHER_PORTAL
 			){
 				continue;
 			}

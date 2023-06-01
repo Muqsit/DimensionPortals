@@ -8,6 +8,7 @@ use muqsit\dimensionportals\config\BadConfigurationException;
 use muqsit\dimensionportals\config\Configuration;
 use muqsit\dimensionportals\exoblock\ExoBlockFactory;
 use muqsit\dimensionportals\player\PlayerManager;
+use muqsit\dimensionportals\vanilla\ExtraVanillaData;
 use muqsit\dimensionportals\world\WorldManager;
 use pocketmine\plugin\PluginBase;
 use RuntimeException;
@@ -25,6 +26,8 @@ final class Loader extends PluginBase{
 			$this->getLogger()->warning("Delete the configuration file ({$this->getConfig()->getPath()}) to regenerate a fresh configuration.");
 			throw new RuntimeException("Failed to load due to bad configuration");
 		}
+
+		ExtraVanillaData::registerOnAllThreads($this->getServer()->getAsyncPool());
 	}
 
 	protected function onEnable() : void{
