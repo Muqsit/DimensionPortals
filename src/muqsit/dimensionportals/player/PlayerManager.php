@@ -35,13 +35,13 @@ final class PlayerManager{
 		SimplePacketHandler::createInterceptor($plugin)->interceptOutgoing(static function(StartGamePacket $packet, NetworkSession $target) : bool{
 			$world = WorldManager::get($target->getPlayer()->getWorld());
 			if($world !== null){
-				$dimensionId = $world->getNetworkDimensionId();
+				$dimensionId = $world->network_dimension_id;
 				if($dimensionId !== $packet->levelSettings->spawnSettings->getDimension()){
 					$pk = clone $packet;
 					$pk->levelSettings->spawnSettings = new SpawnSettings(
 						$packet->levelSettings->spawnSettings->getBiomeType(),
 						$packet->levelSettings->spawnSettings->getBiomeName(),
-						$world->getNetworkDimensionId()
+						$dimensionId
 					);
 					$target->sendDataPacket($pk);
 					return false;

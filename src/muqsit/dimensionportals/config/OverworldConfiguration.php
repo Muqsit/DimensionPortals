@@ -17,10 +17,6 @@ final class OverworldConfiguration{
 	}
 
 	public function __construct(
-		private string $world
+		readonly public string $world
 	){}
-
-	public function getWorld() : string{
-		return $this->world;
-	}
 }

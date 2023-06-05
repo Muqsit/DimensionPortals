@@ -36,14 +36,14 @@ final class WorldManager{
 	public static function init(Loader $plugin) : void{
 		$config = $plugin->getConfiguration();
 		self::$main_worlds = [
-			self::TYPE_OVERWORLD => $config->getOverworld()->getWorld(),
-			self::TYPE_NETHER => $config->getNether()->getWorld(),
-			self::TYPE_END => $config->getEnd()->getWorld()
+			self::TYPE_OVERWORLD => $config->overworld->world,
+			self::TYPE_NETHER => $config->nether->world,
+			self::TYPE_END => $config->end->world
 		];
 
-		self::registerWorldHolder(self::TYPE_OVERWORLD, new WorldHolder(OverworldInstance::class));
-		self::registerWorldHolder(self::TYPE_NETHER, new WorldHolder(NetherWorldInstance::class));
-		self::registerWorldHolder(self::TYPE_END, new WorldHolder(EndWorldInstance::class));
+		self::registerWorldHolder(self::TYPE_OVERWORLD, new WorldHolder(fn(World $world) => new OverworldInstance($world, DimensionIds::OVERWORLD)));
+		self::registerWorldHolder(self::TYPE_NETHER, new WorldHolder(fn(World $world) => new NetherWorldInstance($world, DimensionIds::NETHER)));
+		self::registerWorldHolder(self::TYPE_END, new WorldHolder(fn(World $world) => new EndWorldInstance($world, DimensionIds::THE_END)));
 
 		$dimension_fix = $plugin->getServer()->getPluginManager()->getPlugin("DimensionFix");
 		assert($dimension_fix === null || $dimension_fix instanceof \muqsit\dimensionfix\Loader);
@@ -68,15 +68,15 @@ final class WorldManager{
 			}
 		};
 
-		$register_world_type($config->getOverworld()->getWorld(), self::TYPE_OVERWORLD);
-		$register_world_type($config->getNether()->getWorld(), self::TYPE_NETHER);
-		$register_world_type($config->getEnd()->getWorld(), self::TYPE_END);
+		$register_world_type($config->overworld->world, self::TYPE_OVERWORLD);
+		$register_world_type($config->nether->world, self::TYPE_NETHER);
+		$register_world_type($config->end->world, self::TYPE_END);
 
-		foreach($config->getNether()->getSubWorlds() as $sub_world){
+		foreach($config->nether->sub_worlds as $sub_world){
 			$register_world_type($sub_world, self::TYPE_NETHER);
 		}
 
-		foreach($config->getEnd()->getSubWorlds() as $sub_world){
+		foreach($config->end->sub_worlds as $sub_world){
 			$register_world_type($sub_world, self::TYPE_END);
 		}
 
@@ -108,7 +108,7 @@ final class WorldManager{
 	}
 
 	public static function destroy(World $world) : void{
-		if(isset(self::$worlds[$folder = $world->getFolderName()]) && self::$main_worlds[self::$worlds[$folder]->getWorldInstance()->getNetworkDimensionId()] === $folder){
+		if(isset(self::$worlds[$folder = $world->getFolderName()]) && self::$main_worlds[self::$worlds[$folder]->getWorldInstance()->network_dimension_id] === $folder){
 			throw new RuntimeException("Tried to unload permanent world " . $folder . " on runtime.");
 		}
 

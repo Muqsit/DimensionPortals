@@ -21,20 +21,8 @@ final class NetherPortalConfiguration{
 	}
 
 	public function __construct(
-		private string $frame_block,
-		private int $max_width,
-		private int $max_height
+		readonly public string $frame_block,
+		readonly public int $max_width,
+		readonly public int $max_height
 	){}
-
-	public function getFrameBlock() : string{
-		return $this->frame_block;
-	}
-
-	public function getMaxWidth() : int{
-		return $this->max_width;
-	}
-
-	public function getMaxHeight() : int{
-		return $this->max_height;
-	}
 }

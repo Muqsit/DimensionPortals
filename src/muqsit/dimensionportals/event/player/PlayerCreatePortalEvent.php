@@ -14,8 +14,8 @@ class PlayerCreatePortalEvent extends DimensionPortalsEvent implements Cancellab
 	use CancellableTrait;
 
 	public function __construct(
-		private Player $player,
-		private Position $block_pos
+		readonly public Player $player,
+		readonly public Position $block_pos
 	){}
 
 	final public function getPlayer() : Player{

@@ -22,30 +22,30 @@ final class ExoBlockFactory{
 
 	public static function init(Loader $loader) : void{
 		$loader->getServer()->getPluginManager()->registerEvents(new ExoBlockEventHandler(), $loader);
-		self::initNether($loader->getConfiguration()->getNether());
-		self::initEnd($loader->getConfiguration()->getEnd());
+		self::initNether($loader->getConfiguration()->nether);
+		self::initEnd($loader->getConfiguration()->end);
 	}
 
 	private static function initNether(NetherConfiguration $config) : void{
-		$frame_block = StringToItemParser::getInstance()->parse($config->getPortal()->getFrameBlock())->getBlock();
+		$frame_block = StringToItemParser::getInstance()->parse($config->portal->frame_block)->getBlock();
 		if($frame_block->getTypeId() === BlockTypeIds::AIR){
-			throw new InvalidArgumentException("Invalid nether portal frame block " . $config->getPortal()->getFrameBlock());
+			throw new InvalidArgumentException("Invalid nether portal frame block " . $config->portal->frame_block);
 		}
 
 		self::register(
 			new NetherPortalFrameExoBlock(
 				$frame_block,
-				$config->getPortal()->getMaxHeight(),
-				$config->getPortal()->getMaxWidth()
+				$config->portal->max_height,
+				$config->portal->max_width
 			),
 			$frame_block
 		);
-		self::register(new NetherPortalExoBlock($config->getTeleportationDuration(), $frame_block), VanillaBlocks::NETHER_PORTAL());
+		self::register(new NetherPortalExoBlock($config->teleportation_duration, $frame_block), VanillaBlocks::NETHER_PORTAL());
 	}
 
 	private static function initEnd(EndConfiguration $config) : void{
 		self::register(new EndPortalFrameExoBlock(), VanillaBlocks::END_PORTAL_FRAME());
-		self::register(new EndPortalExoBlock($config->getTeleportationDuration()), ExtraVanillaBlocks::END_PORTAL());
+		self::register(new EndPortalExoBlock($config->teleportation_duration), ExtraVanillaBlocks::END_PORTAL());
 	}
 
 	public static function register(ExoBlock $exo_block, Block $block) : void{

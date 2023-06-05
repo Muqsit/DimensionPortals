@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace muqsit\dimensionportals\world;
 
+use pocketmine\network\mcpe\protocol\types\DimensionIds;
 use pocketmine\world\World;
 
 abstract class WorldInstance{
 
+	/**
+	 * @param World $world
+	 * @param DimensionIds::* $network_dimension_id
+	 */
 	final public function __construct(
-		protected World $world
+		readonly public World $world,
+		readonly public int $network_dimension_id
 	){}
-
-	final public function getWorld() : World{
-		return $this->world;
-	}
-
-	abstract public function getNetworkDimensionId() : int;
 
 	abstract public function onChunkLoad(int $chunkX, int $chunkZ) : void;
 

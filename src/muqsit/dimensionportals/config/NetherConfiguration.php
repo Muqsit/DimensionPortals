@@ -28,28 +28,9 @@ final class NetherConfiguration{
 	 * @param NetherPortalConfiguration $portal
 	 */
 	public function __construct(
-		private string $world,
-		private array $sub_worlds,
-		private int $teleportation_duration,
-		private NetherPortalConfiguration $portal
+		readonly public string $world,
+		readonly public array $sub_worlds,
+		readonly public int $teleportation_duration,
+		readonly public NetherPortalConfiguration $portal
 	){}
-
-	public function getWorld() : string{
-		return $this->world;
-	}
-
-	/**
-	 * @return string[]
-	 */
-	public function getSubWorlds() : array{
-		return $this->sub_worlds;
-	}
-
-	public function getTeleportationDuration() : int{
-		return $this->teleportation_duration;
-	}
-
-	public function getPortal() : NetherPortalConfiguration{
-		return $this->portal;
-	}
 }

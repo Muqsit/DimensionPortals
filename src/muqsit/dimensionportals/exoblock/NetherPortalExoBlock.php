@@ -24,7 +24,7 @@ use function assert;
 
 class NetherPortalExoBlock extends PortalExoBlock{
 
-	private int $frame_block_id;
+	readonly private int $frame_block_id;
 
 	public function __construct(int $teleportation_duration, Block $frame_block){
 		parent::__construct($teleportation_duration);

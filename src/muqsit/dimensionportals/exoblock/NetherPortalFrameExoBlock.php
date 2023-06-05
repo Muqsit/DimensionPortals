@@ -20,12 +20,12 @@ use SplQueue;
 
 class NetherPortalFrameExoBlock implements ExoBlock{
 
-	private int $frame_block_id;
-	private float $lengthSquared;
+	readonly private int $frame_block_id;
+	readonly private float $length_squared;
 
 	public function __construct(Block $frame_block, int $max_portal_height, int $max_portal_width){
 		$this->frame_block_id = $frame_block->getTypeId();
-		$this->lengthSquared = (new Vector2($max_portal_height, $max_portal_width))->lengthSquared();
+		$this->length_squared = (new Vector2($max_portal_height, $max_portal_width))->lengthSquared();
 	}
 
 	public function interact(Block $wrapping, Player $player, Item $item, int $face) : bool{
@@ -80,7 +80,7 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 		while(!$visits->isEmpty()){
 			/** @var Vector3 $coordinates */
 			$coordinates = $visits->dequeue();
-			if($origin->distanceSquared($coordinates) >= $this->lengthSquared){
+			if($origin->distanceSquared($coordinates) >= $this->length_squared){
 				return [];
 			}
 

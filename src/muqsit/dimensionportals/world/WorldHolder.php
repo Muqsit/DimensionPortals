@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace muqsit\dimensionportals\world;
 
-use pocketmine\utils\Utils;
+use Closure;
 use pocketmine\world\World;
 
 final class WorldHolder{
@@ -12,17 +12,14 @@ final class WorldHolder{
 	private WorldInstance $instance;
 
 	/**
-	 * @template TWorldInstance of WorldInstance
-	 * @param class-string<TWorldInstance> $class
+	 * @param Closure(World) : WorldInstance $builder
 	 */
 	public function __construct(
-		private string $class
-	){
-		Utils::testValidInstance($this->class, WorldInstance::class);
-	}
+		readonly private Closure $builder
+	){}
 
 	public function create(World $world) : void{
-		$this->instance = new $this->class($world);
+		$this->instance = ($this->builder)($world);
 	}
 
 	public function getWorldInstance() : WorldInstance{

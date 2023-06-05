@@ -19,20 +19,8 @@ final class Configuration{
 	}
 
 	public function __construct(
-		private OverworldConfiguration $overworld,
-		private NetherConfiguration $nether,
-		private EndConfiguration $end
+		readonly public OverworldConfiguration $overworld,
+		readonly public NetherConfiguration $nether,
+		readonly public EndConfiguration $end
 	){}
-
-	public function getOverworld() : OverworldConfiguration{
-		return $this->overworld;
-	}
-
-	public function getNether() : NetherConfiguration{
-		return $this->nether;
-	}
-
-	public function getEnd() : EndConfiguration{
-		return $this->end;
-	}
 }

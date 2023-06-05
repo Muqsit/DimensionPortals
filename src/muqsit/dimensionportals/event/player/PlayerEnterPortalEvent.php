@@ -13,15 +13,11 @@ use pocketmine\player\Player;
 class PlayerEnterPortalEvent extends DimensionPortalsEvent implements Cancellable{
 	use CancellableTrait;
 
-	private Player $player;
-	private PortalExoBlock $block;
-	private int $teleport_duration;
-
-	public function __construct(Player $player, PortalExoBlock $block, int $teleport_duration){
-		$this->player = $player;
-		$this->block = $block;
-		$this->teleport_duration = $teleport_duration;
-	}
+	public function __construct(
+		readonly public Player $player,
+		readonly public PortalExoBlock $block,
+		public int $teleport_duration
+	){}
 
 	public function getPlayer() : Player{
 		return $this->player;

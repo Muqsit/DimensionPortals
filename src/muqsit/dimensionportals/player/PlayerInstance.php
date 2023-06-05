@@ -18,8 +18,8 @@ use PrefixedLogger;
 
 final class PlayerInstance{
 
-	private Player $player;
-	private Logger $logger;
+	readonly public Player $player;
+	readonly public Logger $logger;
 	private ?PlayerPortalInfo $in_portal = null;
 	private bool $changing_dimension = false;
 
@@ -29,9 +29,9 @@ final class PlayerInstance{
 	}
 
 	public function onEnterPortal(PortalExoBlock $block) : void{
-		($ev = new PlayerEnterPortalEvent($this->player, $block, $this->player->isCreative() ? 0 : $block->getTeleportationDuration()))->call();
+		($ev = new PlayerEnterPortalEvent($this->player, $block, $this->player->isCreative() ? 0 : $block->teleportation_duration))->call();
 		if(!$ev->isCancelled()){
-			$this->in_portal = new PlayerPortalInfo($block, $ev->getTeleportDuration());
+			$this->in_portal = new PlayerPortalInfo($block, $ev->teleport_duration);
 			PlayerManager::scheduleTicking($this->player);
 		}
 	}
@@ -76,12 +76,12 @@ final class PlayerInstance{
 	}
 
 	private function teleport() : void{
-		$to = $this->in_portal->getBlock()->getTargetWorldInstance();
-		$world = (WorldManager::get($this->player->getWorld()) === $to ? WorldManager::getOverworld() : $to)->getWorld();
+		$to = $this->in_portal->block->getTargetWorldInstance();
+		$world = (WorldManager::get($this->player->getWorld()) === $to ? WorldManager::getOverworld() : $to)->world;
 		$target = Location::fromObject($world->getSpawnLocation(), $world, 0.0, 0.0);
-		($ev = new PlayerPortalTeleportEvent($this->player, $this->in_portal->getBlock(), $target))->call();
+		($ev = new PlayerPortalTeleportEvent($this->player, $this->in_portal->block, $target))->call();
 		if(!$ev->isCancelled()){
-			$this->player->teleport($ev->getTarget());
+			$this->player->teleport($ev->target);
 		}
 	}
 }

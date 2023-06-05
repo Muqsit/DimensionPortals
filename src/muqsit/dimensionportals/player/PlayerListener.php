@@ -12,7 +12,7 @@ use pocketmine\event\player\PlayerQuitEvent;
 final class PlayerListener implements Listener{
 
 	public function __construct(
-		private Logger $logger
+		readonly private Logger $logger
 	){}
 
 	/**

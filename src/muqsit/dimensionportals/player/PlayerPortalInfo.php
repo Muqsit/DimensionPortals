@@ -11,13 +11,9 @@ final class PlayerPortalInfo{
 	private int $duration = 0;
 
 	public function __construct(
-		private PortalExoBlock $block,
-		private int $max_duration
+		readonly public PortalExoBlock $block,
+		readonly public int $max_duration
 	){}
-
-	public function getBlock() : PortalExoBlock{
-		return $this->block;
-	}
 
 	public function tick() : bool{
 		if($this->duration === $this->max_duration){
