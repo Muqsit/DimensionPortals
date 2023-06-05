@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace muqsit\dimensionportals\world;
 
 use muqsit\dimensionportals\Loader;
-use muqsit\dimensionportals\world\end\EndWorldInstance;
-use muqsit\dimensionportals\world\nether\NetherWorldInstance;
-use muqsit\dimensionportals\world\overworld\OverworldInstance;
 use pocketmine\network\mcpe\protocol\types\DimensionIds;
 use pocketmine\Server;
 use pocketmine\world\World;
@@ -41,9 +38,9 @@ final class WorldManager{
 			self::TYPE_END => $config->end->world
 		];
 
-		self::registerWorldHolder(self::TYPE_OVERWORLD, new WorldHolder(fn(World $world) => new OverworldInstance($world, DimensionIds::OVERWORLD)));
-		self::registerWorldHolder(self::TYPE_NETHER, new WorldHolder(fn(World $world) => new NetherWorldInstance($world, DimensionIds::NETHER)));
-		self::registerWorldHolder(self::TYPE_END, new WorldHolder(fn(World $world) => new EndWorldInstance($world, DimensionIds::THE_END)));
+		self::registerWorldHolder(self::TYPE_OVERWORLD, new WorldHolder(fn(World $world) => new WorldInstance($world, DimensionIds::OVERWORLD)));
+		self::registerWorldHolder(self::TYPE_NETHER, new WorldHolder(fn(World $world) => new WorldInstance($world, DimensionIds::NETHER)));
+		self::registerWorldHolder(self::TYPE_END, new WorldHolder(fn(World $world) => new WorldInstance($world, DimensionIds::THE_END)));
 
 		$dimension_fix = $plugin->getServer()->getPluginManager()->getPlugin("DimensionFix");
 		assert($dimension_fix === null || $dimension_fix instanceof \muqsit\dimensionfix\Loader);
@@ -119,22 +116,16 @@ final class WorldManager{
 		return isset(self::$worlds[$folder = $world->getFolderName()]) ? self::$worlds[$folder]->getWorldInstance() : null;
 	}
 
-	public static function getOverworld() : OverworldInstance{
-		$world = self::getFromType(self::TYPE_OVERWORLD);
-		assert($world instanceof OverworldInstance);
-		return $world;
+	public static function getOverworld() : WorldInstance{
+		return self::getFromType(self::TYPE_OVERWORLD);
 	}
 
-	public static function getNether() : NetherWorldInstance{
-		$world = self::getFromType(self::TYPE_NETHER);
-		assert($world instanceof NetherWorldInstance);
-		return $world;
+	public static function getNether() : WorldInstance{
+		return self::getFromType(self::TYPE_NETHER);
 	}
 
-	public static function getEnd() : EndWorldInstance{
-		$world = self::getFromType(self::TYPE_END);
-		assert($world instanceof EndWorldInstance);
-		return $world;
+	public static function getEnd() : WorldInstance{
+		return self::getFromType(self::TYPE_END);
 	}
 
 	private static function getFromType(int $type) : WorldInstance{
