@@ -43,7 +43,6 @@ final class PlayerInstance{
 
 	public function onBeginDimensionChange(int $network_dimension_id, Vector3 $position, bool $respawn) : void{
 		$session = $this->player->getNetworkSession();
-
 		PlayerManager::$_changing_dimension_sessions[spl_object_id($session)] = true;
 		$this->changing_dimension = true;
 		$session->sendDataPacket(ChangeDimensionPacket::create($network_dimension_id, $position, $respawn));

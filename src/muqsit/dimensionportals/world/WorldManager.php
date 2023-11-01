@@ -101,7 +101,7 @@ final class WorldManager{
 	}
 
 	public static function autoRegister(World $world) : void{
-		self::register($world_name = $world->getFolderName(), self::$world_type_holders[self::$world_types[$world_name] ?? self::TYPE_OVERWORLD]);
+		self::register($world_name = $world->getFolderName(), clone self::$world_type_holders[self::$world_types[$world_name] ?? self::TYPE_OVERWORLD]);
 	}
 
 	public static function destroy(World $world) : void{
