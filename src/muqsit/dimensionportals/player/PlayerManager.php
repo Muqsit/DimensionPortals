@@ -11,7 +11,9 @@ use muqsit\simplepackethandler\SimplePacketHandler;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\protocol\MovePlayerPacket;
 use pocketmine\network\mcpe\protocol\PlayerActionPacket;
+use pocketmine\network\mcpe\protocol\PlayerAuthInputPacket;
 use pocketmine\network\mcpe\protocol\StartGamePacket;
+use pocketmine\network\mcpe\protocol\types\BlockPosition;
 use pocketmine\network\mcpe\protocol\types\PlayerAction;
 use pocketmine\network\mcpe\protocol\types\SpawnSettings;
 use pocketmine\player\Player;
@@ -27,6 +29,9 @@ final class PlayerManager{
 
 	/** @var true[] */
 	public static array $_changing_dimension_sessions = [];
+
+	/** @var int[] */
+	public static array $_queue_fast_dimension_change_request = [];
 
 	public static function init(Loader $plugin) : void{
 		$plugin->getServer()->getPluginManager()->registerEvents(new PlayerListener($plugin->getLogger()), $plugin);
@@ -50,6 +55,8 @@ final class PlayerManager{
 			return true;
 		})->interceptIncoming(static function(MovePlayerPacket $packet, NetworkSession $origin) : bool{
 			return !isset(self::$_changing_dimension_sessions[spl_object_id($origin)]);
+		})->interceptIncoming(static function(PlayerAuthInputPacket $packet, NetworkSession $origin) : bool{
+			return !isset(self::$_changing_dimension_sessions[spl_object_id($origin)]);
 		});
 
 		SimplePacketHandler::createMonitor($plugin)->monitorIncoming(static function(PlayerActionPacket $packet, NetworkSession $origin) : void{
@@ -65,6 +72,14 @@ final class PlayerManager{
 			foreach(self::$ticking as $player_id){
 				self::$players[$player_id]->tick();
 			}
+			foreach(self::$_queue_fast_dimension_change_request as $id){
+				if(isset(self::$players[$id])){
+					$player = self::$players[$id]->player;
+					$location = BlockPosition::fromVector3($player->getLocation());
+					$player->getNetworkSession()->sendDataPacket(PlayerActionPacket::create($player->getId(), PlayerAction::DIMENSION_CHANGE_ACK, $location, $location, 0));
+				}
+			}
+			self::$_queue_fast_dimension_change_request = [];
 		}), 1);
 	}
 

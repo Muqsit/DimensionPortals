@@ -12,7 +12,6 @@ use muqsit\dimensionportals\world\WorldManager;
 use pocketmine\entity\Location;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\ChangeDimensionPacket;
-use pocketmine\network\mcpe\protocol\PlayStatusPacket;
 use pocketmine\player\Player;
 use PrefixedLogger;
 
@@ -46,6 +45,7 @@ final class PlayerInstance{
 		PlayerManager::$_changing_dimension_sessions[spl_object_id($session)] = true;
 		$this->changing_dimension = true;
 		$session->sendDataPacket(ChangeDimensionPacket::create($network_dimension_id, $position, $respawn));
+		PlayerManager::$_queue_fast_dimension_change_request[$id = $this->player->getId()] = $id;
 		$this->logger->debug("Started changing dimension (network_dimension_id: {$network_dimension_id}, position: {$position->asVector3()}, respawn: " . ($respawn ? "true" : "false") . ")");
 	}
 
@@ -53,7 +53,6 @@ final class PlayerInstance{
 		$session = $this->player->getNetworkSession();
 		unset(PlayerManager::$_changing_dimension_sessions[spl_object_id($session)]);
 		$this->changing_dimension = false;
-		$session->sendDataPacket(PlayStatusPacket::create(PlayStatusPacket::PLAYER_SPAWN));
 		$this->logger->debug("Stopped changing dimension");
 	}
 
