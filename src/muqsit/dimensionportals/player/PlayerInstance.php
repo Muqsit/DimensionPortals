@@ -14,17 +14,25 @@ use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\ChangeDimensionPacket;
 use pocketmine\player\Player;
 use PrefixedLogger;
+use ReflectionProperty;
 
 final class PlayerInstance{
 
 	readonly public Player $player;
 	readonly public Logger $logger;
+	readonly private ReflectionProperty $_chunksPerTick;
+	private int $chunks_per_tick_before_change;
+
 	private ?PlayerPortalInfo $in_portal = null;
 	private bool $changing_dimension = false;
 
 	public function __construct(Player $player, Logger $logger){
 		$this->player = $player;
 		$this->logger = new PrefixedLogger($logger, $player->getName());
+
+		static $_chunksPerTick = null;
+		$_chunksPerTick ??= new ReflectionProperty(Player::class, "chunksPerTick");
+		$this->_chunksPerTick = $_chunksPerTick;
 	}
 
 	public function onEnterPortal(PortalExoBlock $block) : void{
@@ -44,6 +52,10 @@ final class PlayerInstance{
 		$session = $this->player->getNetworkSession();
 		PlayerManager::$_changing_dimension_sessions[spl_object_id($session)] = true;
 		$this->changing_dimension = true;
+		$this->chunks_per_tick_before_change = $this->_chunksPerTick->getValue($this->player);
+		if($this->chunks_per_tick_before_change < 40){
+			$this->_chunksPerTick->setValue($this->player, 40);
+		}
 		$session->sendDataPacket(ChangeDimensionPacket::create($network_dimension_id, $position, $respawn));
 		PlayerManager::$_queue_fast_dimension_change_request[$id = $this->player->getId()] = $id;
 		$this->logger->debug("Started changing dimension (network_dimension_id: {$network_dimension_id}, position: {$position->asVector3()}, respawn: " . ($respawn ? "true" : "false") . ")");
@@ -53,6 +65,7 @@ final class PlayerInstance{
 		$session = $this->player->getNetworkSession();
 		unset(PlayerManager::$_changing_dimension_sessions[spl_object_id($session)]);
 		$this->changing_dimension = false;
+		$this->_chunksPerTick->setValue($this->player, $this->chunks_per_tick_before_change);
 		$this->logger->debug("Stopped changing dimension");
 	}
 
