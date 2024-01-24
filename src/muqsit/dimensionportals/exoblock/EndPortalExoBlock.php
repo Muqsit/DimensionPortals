@@ -10,7 +10,9 @@ use muqsit\dimensionportals\world\WorldUtils;
 use pocketmine\block\Block;
 use pocketmine\item\Item;
 use pocketmine\math\Facing;
+use pocketmine\math\Vector3;
 use pocketmine\player\Player;
+use pocketmine\world\BlockTransaction;
 
 class EndPortalExoBlock extends PortalExoBlock{
 
@@ -31,9 +33,10 @@ class EndPortalExoBlock extends PortalExoBlock{
 		return false;
 	}
 
-	public function meetsSupportConditions(Block $block) : bool{
+	public function meetsSupportConditions(BlockTransaction $transaction, Vector3 $pos) : bool{
 		foreach(Facing::HORIZONTAL as $side){
-			$type_id = $block->getSide($side)->getTypeId();
+			$side_pos = $pos->getSide($side);
+			$type_id = $transaction->fetchBlockAt($side_pos->x, $side_pos->y, $side_pos->z)->getTypeId();
 			if($type_id !== $this->frame_block_id && $type_id !== $this->portal_block_id){
 				return false;
 			}
@@ -42,8 +45,8 @@ class EndPortalExoBlock extends PortalExoBlock{
 	}
 
 	public function update(Block $wrapping) : bool{
-		if(!$this->meetsSupportConditions($wrapping)){
-			$pos = $wrapping->getPosition();
+		$pos = $wrapping->getPosition();
+		if(!$this->meetsSupportConditions(new BlockTransaction($pos->getWorld()), $pos)){
 			WorldUtils::removeTouchingBlocks($pos->getWorld(), $this->portal_block_id, $pos, Facing::HORIZONTAL)?->apply();
 		}
 		return false;

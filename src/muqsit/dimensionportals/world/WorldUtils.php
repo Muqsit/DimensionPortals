@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace muqsit\dimensionportals\world;
 
 use pocketmine\block\VanillaBlocks;
+use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\world\BlockTransaction;
 use pocketmine\world\World;
@@ -16,7 +17,7 @@ final class WorldUtils{
 	 * @param World $world
 	 * @param int $find_block_id
 	 * @param Vector3 $origin
-	 * @param value-of<Facing::ALL> $check_sides
+	 * @param list<value-of<Facing::ALL>> $check_sides
 	 * @return BlockTransaction|null
 	 */
 	public static function removeTouchingBlocks(World $world, int $find_block_id, Vector3 $origin, array $check_sides) : ?BlockTransaction{
