@@ -14,8 +14,10 @@ use pocketmine\math\Facing;
 use pocketmine\math\Vector2;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
+use pocketmine\world\BlockTransaction;
 use pocketmine\world\World;
 use SplQueue;
+use function count;
 
 class NetherPortalFrameExoBlock implements ExoBlock{
 
@@ -34,21 +36,12 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 			$affectedBlock = $wrapping->getSide($face);
 			if($affectedBlock->getTypeId() === BlockTypeIds::AIR){
 				$world = $player->getWorld();
-				$pos = $affectedBlock->getPosition()->asVector3();
-				$blocks = $this->fill($world, $pos, 10, Facing::WEST);
-				if(count($blocks) === 0){
-					$blocks = $this->fill($world, $pos, 10, Facing::NORTH);
-				}
-				if(count($blocks) > 0){
-					($ev = new PlayerCreateNetherPortalEvent($player, $wrapping->getPosition()))->call();
+				$pos = $affectedBlock->getPosition();
+				$transaction = $this->fill($world, $pos, Facing::WEST) ?? $this->fill($world, $pos, Facing::NORTH);
+				if($transaction !== null){
+					($ev = new PlayerCreateNetherPortalEvent($player, $wrapping->getPosition(), $transaction))->call();
 					if(!$ev->isCancelled()){
-						$portal_block_id = $this->portal_block->getTypeId();
-						foreach($blocks as $hash => $block){
-							if($block->getTypeId() === $portal_block_id){
-								World::getBlockXYZ($hash, $x, $y, $z);
-								$world->setBlockAt($x, $y, $z, $block, false);
-							}
-						}
+						$transaction->apply();
 						return true;
 					}
 				}
@@ -70,11 +63,10 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 	/**
 	 * @param World $world
 	 * @param Vector3 $origin
-	 * @param int $radius
-	 * @param int $direction
-	 * @return array<int, Block>
+	 * @param Facing::* $direction
+	 * @return BlockTransaction|null
 	 */
-	public function fill(World $world, Vector3 $origin, int $radius, int $direction) : array{
+	public function fill(World $world, Vector3 $origin, int $direction) : ?BlockTransaction{
 		$blocks = [];
 
 		$visits = new SplQueue();
@@ -83,7 +75,7 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 			/** @var Vector3 $coordinates */
 			$coordinates = $visits->dequeue();
 			if($origin->distanceSquared($coordinates) >= $this->length_squared){
-				return [];
+				return null;
 			}
 
 			$coordinates_hash = World::blockHash($coordinates->x, $coordinates->y, $coordinates->z);
@@ -107,11 +99,19 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 				$visits->enqueue($coordinates->getSide(Facing::UP));
 				$visits->enqueue($coordinates->getSide(Facing::DOWN));
 			}elseif(!$this->isValid($block, $coordinates_hash, $blocks)){
-				return [];
+				return null;
 			}
 		}
 
-		return $blocks;
+		if(count($blocks) === 0){
+			return null;
+		}
+		$transaction = new BlockTransaction($world);
+		foreach($blocks as $hash => $block){
+			World::getBlockXYZ($hash, $x, $y, $z);
+			$transaction->addBlockAt($x, $y, $z, $block);
+		}
+		return $transaction;
 	}
 
 	/**

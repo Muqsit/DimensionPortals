@@ -8,6 +8,7 @@ use muqsit\dimensionportals\event\DimensionPortalsEvent;
 use pocketmine\event\Cancellable;
 use pocketmine\event\CancellableTrait;
 use pocketmine\player\Player;
+use pocketmine\world\BlockTransaction;
 use pocketmine\world\Position;
 
 class PlayerCreatePortalEvent extends DimensionPortalsEvent implements Cancellable{
@@ -15,7 +16,8 @@ class PlayerCreatePortalEvent extends DimensionPortalsEvent implements Cancellab
 
 	public function __construct(
 		readonly public Player $player,
-		readonly public Position $block_pos
+		readonly public Position $block_pos,
+		readonly public BlockTransaction $transaction
 	){}
 
 	final public function getPlayer() : Player{
