@@ -29,11 +29,14 @@ class EndPortalFrameExoBlock implements ExoBlock{
 				$transaction = new BlockTransaction($pos->getWorld());
 				$transaction->addBlockAt($pos->x, $pos->y, $pos->z, (clone $wrapping)->setEye(true));
 				$center = $this->findPortalCenterFromFrame($wrapping);
-				if($center !== null && $this->isCompletedPortal($transaction, $center)){
-					$this->createPortal($transaction, $center);
-					($ev = new PlayerCreateEndPortalEvent($player, $pos, $transaction))->call();
-					if($ev->isCancelled()){
-						return true;
+				if($center !== null){
+					$frame_blocks = $this->collectFrameBlocks($transaction, $center);
+					if($frame_blocks !== null){
+						$this->createPortal($transaction, $center);
+						($ev = new PlayerCreateEndPortalEvent($player, $pos, $frame_blocks, $transaction))->call();
+						if($ev->isCancelled()){
+							return true;
+						}
 					}
 				}
 				if($transaction->apply()){
@@ -46,7 +49,7 @@ class EndPortalFrameExoBlock implements ExoBlock{
 			$transaction = new BlockTransaction($world);
 			$transaction->addBlockAt($pos->x, $pos->y, $pos->z, (clone $wrapping)->setEye(false));
 			$center = $this->findPortalCenterFromFrame($wrapping);
-			if($center !== null && !$this->isCompletedPortal($transaction, $center)){
+			if($center !== null && $this->collectFrameBlocks($transaction, $center) === null){
 				$this->destroyPortal($transaction, $center);
 				$transaction->apply();
 				$world->dropItem($pos->add(0.5, 0.75, 0.5), $this->ender_eye_item);
@@ -57,17 +60,6 @@ class EndPortalFrameExoBlock implements ExoBlock{
 	}
 
 	public function update(Block $wrapping) : bool{
-		/** @var EndPortalFrame $wrapping */
-		$center = $this->findPortalCenterFromFrame($wrapping);
-		if($center !== null){
-			$transaction = new BlockTransaction($wrapping->getPosition()->getWorld());
-			if($this->isCompletedPortal($transaction, $center)){
-				$this->createPortal($transaction, $center);
-			}else{
-				$this->destroyPortal($transaction, $center);
-			}
-			$transaction->apply();
-		}
 		return false;
 	}
 
@@ -101,7 +93,13 @@ class EndPortalFrameExoBlock implements ExoBlock{
 		return null;
 	}
 
-	public function isCompletedPortal(BlockTransaction $transaction, Vector3 $center) : bool{
+	/**
+	 * @param BlockTransaction $transaction
+	 * @param Vector3 $center
+	 * @return list<Block>|null
+	 */
+	public function collectFrameBlocks(BlockTransaction $transaction, Vector3 $center) : ?array{
+		$blocks = [];
 		foreach(Facing::HORIZONTAL as $side){
 			$pos = $center->getSide($side, 2);
 			$left = $pos->getSide(Facing::rotateY($side, false));
@@ -112,11 +110,12 @@ class EndPortalFrameExoBlock implements ExoBlock{
 				$transaction->fetchBlockAt($right->x, $right->y, $right->z)
 			] as $block){
 				if(!($block instanceof EndPortalFrame) || !$block->hasEye()){
-					return false;
+					return null;
 				}
+				$blocks[] = $block;
 			}
 		}
-		return true;
+		return $blocks;
 	}
 
 	public function createPortal(BlockTransaction $transaction, Vector3 $center) : void{

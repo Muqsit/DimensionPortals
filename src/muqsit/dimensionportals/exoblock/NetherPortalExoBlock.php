@@ -6,17 +6,14 @@ namespace muqsit\dimensionportals\exoblock;
 
 use muqsit\dimensionportals\world\WorldInstance;
 use muqsit\dimensionportals\world\WorldManager;
+use muqsit\dimensionportals\world\WorldUtils;
 use pocketmine\block\Block;
 use pocketmine\block\NetherPortal;
-use pocketmine\block\VanillaBlocks;
 use pocketmine\item\Item;
 use pocketmine\math\Axis;
 use pocketmine\math\Facing;
-use pocketmine\math\Vector3;
 use pocketmine\player\Player;
-use pocketmine\world\BlockTransaction;
 use pocketmine\world\World;
-use SplQueue;
 use function assert;
 
 class NetherPortalExoBlock extends PortalExoBlock{
@@ -34,32 +31,43 @@ class NetherPortalExoBlock extends PortalExoBlock{
 		return WorldManager::getNether();
 	}
 
-	public function update(Block $wrapping) : bool{
-		assert($wrapping instanceof NetherPortal);
-
-		$pos = $wrapping->getPosition();
-		$world = $pos->getWorld();
-
+	public function meetsSupportConditions(NetherPortal $block) : bool{
+		$pos = $block->getPosition();
 		$shouldKeep = 1;
 		if($pos->y < World::Y_MAX - 1){
-			$shouldKeep &= $this->isValid($wrapping->getSide(Facing::UP)) ? 1 : 0;
+			$shouldKeep &= $this->isValid($block->getSide(Facing::UP)) ? 1 : 0;
 		}
 		if($pos->y > World::Y_MIN){
-			$shouldKeep &= $this->isValid($wrapping->getSide(Facing::DOWN)) ? 1 : 0;
+			$shouldKeep &= $this->isValid($block->getSide(Facing::DOWN)) ? 1 : 0;
 		}
-
-		$axis = $wrapping->getAxis();
+		$axis = $block->getAxis();
 		if($axis === Axis::Z){
-			$shouldKeep &= $this->isValid($wrapping->getSide(Facing::SOUTH)) ? 1 : 0;
-			$shouldKeep &= $this->isValid($wrapping->getSide(Facing::NORTH)) ? 1 : 0;
+			$shouldKeep &= $this->isValid($block->getSide(Facing::SOUTH)) ? 1 : 0;
+			$shouldKeep &= $this->isValid($block->getSide(Facing::NORTH)) ? 1 : 0;
 		}else{
 			assert($axis === Axis::X);
-			$shouldKeep &= $this->isValid($wrapping->getSide(Facing::WEST)) ? 1 : 0;
-			$shouldKeep &= $this->isValid($wrapping->getSide(Facing::EAST)) ? 1 : 0;
+			$shouldKeep &= $this->isValid($block->getSide(Facing::WEST)) ? 1 : 0;
+			$shouldKeep &= $this->isValid($block->getSide(Facing::EAST)) ? 1 : 0;
 		}
+		return $shouldKeep > 0;
+	}
 
-		if($shouldKeep === 0){
-			return $this->fill($world, $pos)?->apply() ?? false;
+	public function update(Block $wrapping) : bool{
+		assert($wrapping instanceof NetherPortal);
+		$pos = $wrapping->getPosition();
+		$world = $pos->getWorld();
+		if(!$this->meetsSupportConditions($wrapping)){
+			$check_sides = [Facing::UP, Facing::DOWN];
+			$axis = $wrapping->getAxis();
+			if($axis === Axis::X){
+				$check_sides[] = Facing::EAST;
+				$check_sides[] = Facing::WEST;
+			}else{
+				assert($axis === Axis::Z);
+				$check_sides[] = Facing::NORTH;
+				$check_sides[] = Facing::SOUTH;
+			}
+			return WorldUtils::removeTouchingBlocks($world, $this->portal_block_id, $pos, $check_sides)?->apply() ?? false;
 		}
 		return false;
 	}
@@ -71,27 +79,5 @@ class NetherPortalExoBlock extends PortalExoBlock{
 	public function isValid(Block $block) : bool{
 		$blockId = $block->getTypeId();
 		return $blockId === $this->frame_block_id || $blockId === $this->portal_block_id;
-	}
-
-	public function fill(World $world, Vector3 $origin) : ?BlockTransaction{
-		$visits = new SplQueue();
-		$visits->enqueue($origin);
-		$air = VanillaBlocks::AIR();
-		$transaction = new BlockTransaction($world);
-		$filled = 0;
-		while(!$visits->isEmpty()){
-			/** @var Vector3 $coordinates */
-			$coordinates = $visits->dequeue();
-			if($transaction->fetchBlockAt($coordinates->x, $coordinates->y, $coordinates->z)->getTypeId() !== $this->portal_block_id){
-				continue;
-			}
-			$transaction->addBlockAt($coordinates->x, $coordinates->y, $coordinates->z, $air);
-			$filled++;
-			$visits->enqueue($coordinates->getSide(Facing::NORTH));
-			$visits->enqueue($coordinates->getSide(Facing::SOUTH));
-			$visits->enqueue($coordinates->getSide(Facing::UP));
-			$visits->enqueue($coordinates->getSide(Facing::DOWN));
-		}
-		return $filled > 0 ? $transaction : null;
 	}
 }

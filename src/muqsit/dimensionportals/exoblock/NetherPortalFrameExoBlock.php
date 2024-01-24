@@ -10,6 +10,7 @@ use pocketmine\block\BlockTypeIds;
 use pocketmine\block\NetherPortal;
 use pocketmine\item\Item;
 use pocketmine\item\ItemTypeIds;
+use pocketmine\math\Axis;
 use pocketmine\math\Facing;
 use pocketmine\math\Vector2;
 use pocketmine\math\Vector3;
@@ -17,6 +18,7 @@ use pocketmine\player\Player;
 use pocketmine\world\BlockTransaction;
 use pocketmine\world\World;
 use SplQueue;
+use function assert;
 
 class NetherPortalFrameExoBlock implements ExoBlock{
 
@@ -36,9 +38,9 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 			if($affectedBlock->getTypeId() === BlockTypeIds::AIR){
 				$world = $player->getWorld();
 				$pos = $affectedBlock->getPosition();
-				$transaction = $this->fill($world, $pos, Facing::WEST) ?? $this->fill($world, $pos, Facing::NORTH);
+				$transaction = $this->fill($world, $pos, Axis::X, $frame_blocks) ?? $this->fill($world, $pos, Axis::Z, $frame_blocks);
 				if($transaction !== null){
-					($ev = new PlayerCreateNetherPortalEvent($player, $wrapping->getPosition(), $transaction))->call();
+					($ev = new PlayerCreateNetherPortalEvent($player, $wrapping->getPosition(), $frame_blocks, $transaction))->call();
 					if(!$ev->isCancelled()){
 						$transaction->apply();
 						return true;
@@ -62,16 +64,19 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 	/**
 	 * @param World $world
 	 * @param Vector3 $origin
-	 * @param value-of<Facing::HORIZONTAL> $direction
+	 * @param Axis::X|Axis::Z $axis
+	 * @param list<Block>|null $frame_blocks
+	 * @param-out list<Block> $frame_blocks
 	 * @return BlockTransaction|null
 	 */
-	public function fill(World $world, Vector3 $origin, int $direction) : ?BlockTransaction{
+	public function fill(World $world, Vector3 $origin, int $axis, ?array &$frame_blocks) : ?BlockTransaction{
 		$visits = new SplQueue();
 		$visits->enqueue($origin);
-		$portal_block = (clone $this->portal_block)->setAxis(Facing::axis(Facing::rotateY($direction, true)));
+		$portal_block = (clone $this->portal_block)->setAxis($axis);
 		$portal_block_id = $portal_block->getTypeId();
 		$transaction = new BlockTransaction($world);
 		$changed = 0;
+		$frame_blocks = [];
 		while(!$visits->isEmpty()){
 			/** @var Vector3 $coordinates */
 			$coordinates = $visits->dequeue();
@@ -83,13 +88,15 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 				continue;
 			}
 
-			$block_type_id = $world->getBlockAt($coordinates->x, $coordinates->y, $coordinates->z)->getTypeId();
+			$block = $world->getBlockAt($coordinates->x, $coordinates->y, $coordinates->z);
+			$block_type_id = $block->getTypeId();
 			if($block_type_id === BlockTypeIds::AIR){
 				$transaction->addBlockAt($coordinates->x, $coordinates->y, $coordinates->z, $portal_block);
-				if($direction === Facing::WEST){
+				if($axis === Axis::Z){
 					$visits->enqueue($coordinates->getSide(Facing::NORTH));
 					$visits->enqueue($coordinates->getSide(Facing::SOUTH));
-				}elseif($direction === Facing::NORTH){
+				}else{
+					assert($axis === Axis::X);
 					$visits->enqueue($coordinates->getSide(Facing::WEST));
 					$visits->enqueue($coordinates->getSide(Facing::EAST));
 				}
@@ -98,6 +105,8 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 				$changed++;
 			}elseif($block_type_id !== $this->frame_block_id){
 				return null;
+			}else{
+				$frame_blocks[] = $block;
 			}
 		}
 		return $changed > 0 ? $transaction : null;

@@ -6,8 +6,8 @@ namespace muqsit\dimensionportals\exoblock;
 
 use muqsit\dimensionportals\world\WorldInstance;
 use muqsit\dimensionportals\world\WorldManager;
+use muqsit\dimensionportals\world\WorldUtils;
 use pocketmine\block\Block;
-use pocketmine\block\VanillaBlocks;
 use pocketmine\item\Item;
 use pocketmine\math\Facing;
 use pocketmine\player\Player;
@@ -31,14 +31,20 @@ class EndPortalExoBlock extends PortalExoBlock{
 		return false;
 	}
 
-	public function update(Block $wrapping) : bool{
+	public function meetsSupportConditions(Block $block) : bool{
 		foreach(Facing::HORIZONTAL as $side){
-			$type_id = $wrapping->getSide($side)->getTypeId();
+			$type_id = $block->getSide($side)->getTypeId();
 			if($type_id !== $this->frame_block_id && $type_id !== $this->portal_block_id){
-				$pos = $wrapping->getPosition();
-				$pos->getWorld()->setBlock($pos, VanillaBlocks::AIR());
-				break;
+				return false;
 			}
+		}
+		return true;
+	}
+
+	public function update(Block $wrapping) : bool{
+		if(!$this->meetsSupportConditions($wrapping)){
+			$pos = $wrapping->getPosition();
+			WorldUtils::removeTouchingBlocks($pos->getWorld(), $this->portal_block_id, $pos, Facing::HORIZONTAL)?->apply();
 		}
 		return false;
 	}
