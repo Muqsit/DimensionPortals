@@ -7,7 +7,6 @@ namespace muqsit\dimensionportals\exoblock;
 use muqsit\dimensionportals\world\WorldInstance;
 use muqsit\dimensionportals\world\WorldManager;
 use pocketmine\block\Block;
-use pocketmine\block\BlockTypeIds;
 use pocketmine\block\NetherPortal;
 use pocketmine\block\RuntimeBlockStateRegistry;
 use pocketmine\block\VanillaBlocks;
@@ -25,10 +24,12 @@ use function assert;
 class NetherPortalExoBlock extends PortalExoBlock{
 
 	readonly private int $frame_block_id;
+	readonly private int $portal_block_id;
 
-	public function __construct(int $teleportation_duration, Block $frame_block){
+	public function __construct(int $teleportation_duration, Block $frame_block, Block $portal_block){
 		parent::__construct($teleportation_duration);
 		$this->frame_block_id = $frame_block->getTypeId();
+		$this->portal_block_id = $portal_block->getTypeId();
 	}
 
 	public function getTargetWorldInstance() : WorldInstance{
@@ -72,7 +73,7 @@ class NetherPortalExoBlock extends PortalExoBlock{
 
 	public function isValid(Block $block) : bool{
 		$blockId = $block->getTypeId();
-		return $blockId === $this->frame_block_id || $blockId === BlockTypeIds::NETHER_PORTAL;
+		return $blockId === $this->frame_block_id || $blockId === $this->portal_block_id;
 	}
 
 	public function fill(World $world, Vector3 $origin, int $metadata) : void{
@@ -89,7 +90,7 @@ class NetherPortalExoBlock extends PortalExoBlock{
 			$coordinates = $visits->dequeue();
 			if(
 				$iterator->moveTo($coordinates->x, $coordinates->y, $coordinates->z) === SubChunkExplorerStatus::INVALID ||
-				$block_state_registry->fromStateId($iterator->currentSubChunk->getBlockStateId($coordinates->x & Chunk::COORD_MASK, $coordinates->y & Chunk::COORD_MASK, $coordinates->z & Chunk::COORD_MASK))->getTypeId() !== BlockTypeIds::NETHER_PORTAL
+				$block_state_registry->fromStateId($iterator->currentSubChunk->getBlockStateId($coordinates->x & Chunk::COORD_MASK, $coordinates->y & Chunk::COORD_MASK, $coordinates->z & Chunk::COORD_MASK))->getTypeId() !== $this->portal_block_id
 			){
 				continue;
 			}

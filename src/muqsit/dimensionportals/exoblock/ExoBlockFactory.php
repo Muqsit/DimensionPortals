@@ -9,6 +9,7 @@ use muqsit\dimensionportals\config\EndConfiguration;
 use muqsit\dimensionportals\config\NetherConfiguration;
 use muqsit\dimensionportals\Loader;
 use muqsit\dimensionportals\vanilla\ExtraVanillaBlocks;
+use muqsit\dimensionportals\vanilla\ExtraVanillaItems;
 use pocketmine\block\Block;
 use pocketmine\block\BlockTypeIds;
 use pocketmine\block\RuntimeBlockStateRegistry;
@@ -32,19 +33,21 @@ final class ExoBlockFactory{
 			throw new InvalidArgumentException("Invalid nether portal frame block " . $config->portal->frame_block);
 		}
 
+		$portal_block = VanillaBlocks::NETHER_PORTAL();
 		self::register(
 			new NetherPortalFrameExoBlock(
 				$frame_block,
+				$portal_block,
 				$config->portal->max_height,
 				$config->portal->max_width
 			),
 			$frame_block
 		);
-		self::register(new NetherPortalExoBlock($config->teleportation_duration, $frame_block), VanillaBlocks::NETHER_PORTAL());
+		self::register(new NetherPortalExoBlock($config->teleportation_duration, $frame_block, $portal_block), $portal_block);
 	}
 
 	private static function initEnd(EndConfiguration $config) : void{
-		self::register(new EndPortalFrameExoBlock(), VanillaBlocks::END_PORTAL_FRAME());
+		self::register(new EndPortalFrameExoBlock(ExtraVanillaBlocks::END_PORTAL(), ExtraVanillaItems::ENDER_EYE()), VanillaBlocks::END_PORTAL_FRAME());
 		self::register(new EndPortalExoBlock($config->teleportation_duration), ExtraVanillaBlocks::END_PORTAL());
 	}
 

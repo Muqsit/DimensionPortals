@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace muqsit\dimensionportals\exoblock;
 
 use muqsit\dimensionportals\event\player\PlayerCreateEndPortalEvent;
-use muqsit\dimensionportals\vanilla\ExtraVanillaBlocks;
-use muqsit\dimensionportals\vanilla\ExtraVanillaItems;
 use pocketmine\block\Block;
 use pocketmine\block\EndPortalFrame;
-use pocketmine\block\RuntimeBlockStateRegistry;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\item\Item;
 use pocketmine\math\Facing;
@@ -19,13 +16,15 @@ class EndPortalFrameExoBlock implements ExoBlock{
 
 	private const SIDES = [Facing::NORTH, Facing::EAST, Facing::SOUTH, Facing::WEST];
 
-	public function __construct(){
-	}
+	public function __construct(
+		readonly private Block $portal_block,
+		readonly private Item $ender_eye_item
+	){}
 
 	public function interact(Block $wrapping, Player $player, Item $item, int $face) : bool{
 		/** @var EndPortalFrame $wrapping */
 		if(!$wrapping->hasEye()){
-			if($item->getTypeId() === ExtraVanillaItems::ENDER_EYE()->getTypeId()){
+			if($item->getTypeId() === $this->ender_eye_item->getTypeId()){
 				($ev = new PlayerCreateEndPortalEvent($player, $wrapping->getPosition()))->call();
 				if(!$ev->isCancelled()){
 					$item->pop();
@@ -36,12 +35,12 @@ class EndPortalFrameExoBlock implements ExoBlock{
 					return true;
 				}
 			}
-		}elseif($item->getTypeId() !== ExtraVanillaItems::ENDER_EYE()->getTypeId()){
+		}elseif($item->getTypeId() !== $this->ender_eye_item->getTypeId()){
 			$wrapping->setEye(false);
 			$pos = $wrapping->getPosition();
 			$world = $pos->getWorld();
 			$world->setBlockAt($pos->x, $pos->y, $pos->z, $wrapping, false);
-			$world->dropItem($pos->add(0.5, 0.75, 0.5), ExtraVanillaItems::ENDER_EYE());
+			$world->dropItem($pos->add(0.5, 0.75, 0.5), $this->ender_eye_item);
 			$this->tryDestroyingPortal($wrapping);
 			return true;
 		}
@@ -89,10 +88,9 @@ class EndPortalFrameExoBlock implements ExoBlock{
 	public function createPortal(Block $center) : void{
 		$pos = $center->getPosition();
 		$world = $pos->getWorld();
-		$block_factory = RuntimeBlockStateRegistry::getInstance();
 		for($i = -1; $i <= 1; ++$i){
 			for($j = -1; $j <= 1; ++$j){
-				$world->setBlockAt($pos->x + $i, $pos->y, $pos->z + $j, ExtraVanillaBlocks::END_PORTAL(), false);
+				$world->setBlockAt($pos->x + $i, $pos->y, $pos->z + $j, $this->portal_block, false);
 			}
 		}
 	}
@@ -111,7 +109,7 @@ class EndPortalFrameExoBlock implements ExoBlock{
 	public function destroyPortal(Block $center) : void{
 		$pos = $center->getPosition();
 		$world = $pos->getWorld();
-		$type_id = ExtraVanillaBlocks::END_PORTAL()->getTypeId();
+		$type_id = $this->portal_block->getTypeId();
 		for($i = -1; $i <= 1; ++$i){
 			for($j = -1; $j <= 1; ++$j){
 				if($world->getBlockAt($pos->x + $i, $pos->y, $pos->z + $j)->getTypeId() === $type_id){

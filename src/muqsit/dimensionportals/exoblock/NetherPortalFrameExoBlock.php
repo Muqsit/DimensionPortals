@@ -8,7 +8,6 @@ use muqsit\dimensionportals\event\player\PlayerCreateNetherPortalEvent;
 use muqsit\dimensionportals\utils\ArrayUtils;
 use pocketmine\block\Block;
 use pocketmine\block\BlockTypeIds;
-use pocketmine\block\VanillaBlocks;
 use pocketmine\item\Item;
 use pocketmine\item\ItemTypeIds;
 use pocketmine\math\Facing;
@@ -21,10 +20,12 @@ use SplQueue;
 class NetherPortalFrameExoBlock implements ExoBlock{
 
 	readonly private int $frame_block_id;
+	readonly private Block $portal_block;
 	readonly private float $length_squared;
 
-	public function __construct(Block $frame_block, int $max_portal_height, int $max_portal_width){
+	public function __construct(Block $frame_block, Block $portal_block, int $max_portal_height, int $max_portal_width){
 		$this->frame_block_id = $frame_block->getTypeId();
+		$this->portal_block = $portal_block;
 		$this->length_squared = (new Vector2($max_portal_height, $max_portal_width))->lengthSquared();
 	}
 
@@ -41,8 +42,9 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 				if(count($blocks) > 0){
 					($ev = new PlayerCreateNetherPortalEvent($player, $wrapping->getPosition()))->call();
 					if(!$ev->isCancelled()){
+						$portal_block_id = $this->portal_block->getTypeId();
 						foreach($blocks as $hash => $block){
-							if($block->getTypeId() === BlockTypeIds::NETHER_PORTAL){
+							if($block->getTypeId() === $portal_block_id){
 								World::getBlockXYZ($hash, $x, $y, $z);
 								$world->setBlockAt($x, $y, $z, $block, false);
 							}
@@ -119,7 +121,7 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 	 */
 	public function visit(Vector3 $coordinates, array &$blocks, int $direction) : void{
 		$axis = Facing::axis(Facing::rotateY($direction, true));
-		$blocks[World::blockHash($coordinates->x, $coordinates->y, $coordinates->z)] = VanillaBlocks::NETHER_PORTAL()->setAxis($axis);
+		$blocks[World::blockHash($coordinates->x, $coordinates->y, $coordinates->z)] = (clone $this->portal_block)->setAxis($axis);
 	}
 
 	/**
@@ -132,7 +134,7 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 		return $block->getTypeId() === $this->frame_block_id ||
 			ArrayUtils::firstOrDefault(
 				$portals,
-				static function(int $hash, Block $b) use($coordinates_hash) : bool{ return $hash === $coordinates_hash && $b->getTypeId() === BlockTypeIds::NETHER_PORTAL; }
+				function(int $hash, Block $b) use($coordinates_hash) : bool{ return $hash === $coordinates_hash && $b->getTypeId() === $this->portal_block->getTypeId(); }
 			) !== null;
 	}
 }

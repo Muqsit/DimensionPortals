@@ -18,7 +18,7 @@ abstract class PortalExoBlock implements ExoBlock{
 	abstract public function getTargetWorldInstance() : WorldInstance;
 
 	public function onPlayerMoveInside(Player $player, Block $block) : void{
-		PlayerManager::get($player)->onEnterPortal($this);
+		PlayerManager::get($player)->onEnterPortal($this, $block->getPosition());
 	}
 
 	public function onPlayerMoveOutside(Player $player, Block $block) : void{

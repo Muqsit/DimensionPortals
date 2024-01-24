@@ -13,6 +13,7 @@ use pocketmine\entity\Location;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\ChangeDimensionPacket;
 use pocketmine\player\Player;
+use pocketmine\world\Position;
 use PrefixedLogger;
 use ReflectionProperty;
 
@@ -35,8 +36,8 @@ final class PlayerInstance{
 		$this->_chunksPerTick = $_chunksPerTick;
 	}
 
-	public function onEnterPortal(PortalExoBlock $block) : void{
-		($ev = new PlayerEnterPortalEvent($this->player, $block, $this->player->isCreative() ? 0 : $block->teleportation_duration))->call();
+	public function onEnterPortal(PortalExoBlock $block, Position $position) : void{
+		($ev = new PlayerEnterPortalEvent($this->player, $block, $position, $this->player->isCreative() ? 0 : $block->teleportation_duration))->call();
 		if(!$ev->isCancelled()){
 			$this->in_portal = new PlayerPortalInfo($block, $ev->teleport_duration);
 			PlayerManager::scheduleTicking($this->player);
