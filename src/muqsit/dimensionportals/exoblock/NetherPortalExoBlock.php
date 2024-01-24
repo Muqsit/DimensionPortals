@@ -11,6 +11,7 @@ use pocketmine\block\NetherPortal;
 use pocketmine\block\RuntimeBlockStateRegistry;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\item\Item;
+use pocketmine\math\Axis;
 use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
 use pocketmine\player\Player;
@@ -50,20 +51,20 @@ class NetherPortalExoBlock extends PortalExoBlock{
 			$shouldKeep &= $this->isValid($world->getBlockAt($pos->x, $pos->y - 1, $pos->z));
 		}
 
-		$metadata = $wrapping->getAxis();
-		if($metadata < 2){
+		$axis = $wrapping->getAxis();
+		if($axis === Axis::Z){
 			$shouldKeep &= $this->isValid($world->getBlockAt($pos->x - 1, $pos->y, $pos->z));
 			$shouldKeep &= $this->isValid($world->getBlockAt($pos->x + 1, $pos->y, $pos->z));
 		}else{
+			assert($axis === Axis::X);
 			$shouldKeep &= $this->isValid($world->getBlockAt($pos->x, $pos->y, $pos->z - 1));
 			$shouldKeep &= $this->isValid($world->getBlockAt($pos->x, $pos->y, $pos->z + 1));
 		}
 
 		if($shouldKeep === 0){
-			$this->fill($world, $pos, $metadata);
+			$this->fill($world, $pos);
 			return true;
 		}
-
 		return false;
 	}
 
@@ -76,7 +77,7 @@ class NetherPortalExoBlock extends PortalExoBlock{
 		return $blockId === $this->frame_block_id || $blockId === $this->portal_block_id;
 	}
 
-	public function fill(World $world, Vector3 $origin, int $metadata) : void{
+	public function fill(World $world, Vector3 $origin) : void{
 		$visits = new SplQueue();
 		$visits->enqueue($origin);
 
@@ -94,17 +95,9 @@ class NetherPortalExoBlock extends PortalExoBlock{
 			){
 				continue;
 			}
-
 			$world->setBlockAt($coordinates->x, $coordinates->y, $coordinates->z, $air);
-
-			if($metadata === 0){
-				$visits->enqueue($coordinates->getSide(Facing::EAST));
-				$visits->enqueue($coordinates->getSide(Facing::WEST));
-			}else{
-				$visits->enqueue($coordinates->getSide(Facing::NORTH));
-				$visits->enqueue($coordinates->getSide(Facing::SOUTH));
-			}
-
+			$visits->enqueue($coordinates->getSide(Facing::NORTH));
+			$visits->enqueue($coordinates->getSide(Facing::SOUTH));
 			$visits->enqueue($coordinates->getSide(Facing::UP));
 			$visits->enqueue($coordinates->getSide(Facing::DOWN));
 		}
