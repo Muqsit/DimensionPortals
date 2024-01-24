@@ -16,8 +16,6 @@ use pocketmine\world\BlockTransaction;
 
 class EndPortalFrameExoBlock implements ExoBlock{
 
-	private const SIDES = [Facing::NORTH, Facing::EAST, Facing::SOUTH, Facing::WEST];
-
 	public function __construct(
 		readonly private Block $portal_block,
 		readonly private Item $ender_eye_item
@@ -28,26 +26,29 @@ class EndPortalFrameExoBlock implements ExoBlock{
 		if(!$wrapping->hasEye()){
 			if($item->getTypeId() === $this->ender_eye_item->getTypeId()){
 				$pos = $wrapping->getPosition();
-				$wrapping->setEye(true);
 				$transaction = new BlockTransaction($pos->getWorld());
-				$transaction->addBlockAt($pos->x, $pos->y, $pos->z, $wrapping);
-				if($this->tryCreatingPortal($transaction, $pos)){
+				$transaction->addBlockAt($pos->x, $pos->y, $pos->z, (clone $wrapping)->setEye(true));
+				$center = $this->findPortalCenterFromFrame($wrapping);
+				if($center !== null && $this->isCompletedPortal($transaction, $center)){
+					$this->createPortal($transaction, $center);
 					($ev = new PlayerCreateEndPortalEvent($player, $pos, $transaction))->call();
-					if(!$ev->isCancelled()){
-						if($transaction->apply()){
-							$item->pop();
-						}
+					if($ev->isCancelled()){
 						return true;
 					}
 				}
+				if($transaction->apply()){
+					$item->pop();
+				}
 			}
 		}elseif($item->getTypeId() !== $this->ender_eye_item->getTypeId()){
-			$wrapping->setEye(false);
 			$pos = $wrapping->getPosition();
 			$world = $pos->getWorld();
 			$transaction = new BlockTransaction($world);
-			$transaction->addBlockAt($pos->x, $pos->y, $pos->z, $wrapping);
-			if($this->tryDestroyingPortal($transaction, $pos) && $transaction->apply()){
+			$transaction->addBlockAt($pos->x, $pos->y, $pos->z, (clone $wrapping)->setEye(false));
+			$center = $this->findPortalCenterFromFrame($wrapping);
+			if($center !== null && !$this->isCompletedPortal($transaction, $center)){
+				$this->destroyPortal($transaction, $center);
+				$transaction->apply();
 				$world->dropItem($pos->add(0.5, 0.75, 0.5), $this->ender_eye_item);
 			}
 			return true;
@@ -57,12 +58,15 @@ class EndPortalFrameExoBlock implements ExoBlock{
 
 	public function update(Block $wrapping) : bool{
 		/** @var EndPortalFrame $wrapping */
-		if($wrapping->hasEye()){
-			$pos = $wrapping->getPosition();
-			$transaction = new BlockTransaction($pos->getWorld());
-			if($this->tryDestroyingPortal($transaction, $pos)){
-				$transaction->apply();
+		$center = $this->findPortalCenterFromFrame($wrapping);
+		if($center !== null){
+			$transaction = new BlockTransaction($wrapping->getPosition()->getWorld());
+			if($this->isCompletedPortal($transaction, $center)){
+				$this->createPortal($transaction, $center);
+			}else{
+				$this->destroyPortal($transaction, $center);
 			}
+			$transaction->apply();
 		}
 		return false;
 	}
@@ -73,53 +77,57 @@ class EndPortalFrameExoBlock implements ExoBlock{
 	public function onPlayerMoveOutside(Player $player, Block $block) : void{
 	}
 
+	public function findPortalCenterFromFrame(EndPortalFrame $block) : ?Vector3{
+		$facing = $block->getFacing();
+		$pos = $block->getPosition();
+		$left = $block->getSide(Facing::rotateY($facing, false))->hasSameTypeId($block);
+		$right = $block->getSide(Facing::rotateY($facing, true))->hasSameTypeId($block);
+		if($left && $right){
+			return $pos->getSide($facing, 2);
+		}
+		if($left){
+			return $pos->getSide($facing, 2)->getSide(Facing::rotateY($facing, false));
+		}
+		if($right){
+			return $pos->getSide($facing, 2)->getSide(Facing::rotateY($facing, true));
+		}
+		$facing_block = $block->getSide($facing);
+		if($facing_block->getSide(Facing::rotateY($facing, false))->hasSameTypeId($block)){
+			return $pos->getSide($facing, 2)->getSide(Facing::rotateY($facing, true));
+		}
+		if($facing_block->getSide(Facing::rotateY($facing, true))->hasSameTypeId($block)){
+			return $pos->getSide($facing, 2)->getSide(Facing::rotateY($facing, false));
+		}
+		return null;
+	}
+
 	public function isCompletedPortal(BlockTransaction $transaction, Vector3 $center) : bool{
-		for($i = 0; $i < 4; ++$i){
-			for($j = -1; $j <= 1; ++$j){
-				$pos = $center->getSide(self::SIDES[$i], 2)->getSide(self::SIDES[($i + 1) % 4], $j);
-				$block = $transaction->fetchBlockAt($pos->x, $pos->y, $pos->z);
+		foreach(Facing::HORIZONTAL as $side){
+			$pos = $center->getSide($side, 2);
+			$left = $pos->getSide(Facing::rotateY($side, false));
+			$right = $pos->getSide(Facing::rotateY($side, true));
+			foreach([
+				$transaction->fetchBlockAt($pos->x, $pos->y, $pos->z),
+				$transaction->fetchBlockAt($left->x, $left->y, $left->z),
+				$transaction->fetchBlockAt($right->x, $right->y, $right->z)
+			] as $block){
 				if(!($block instanceof EndPortalFrame) || !$block->hasEye()){
 					return false;
 				}
 			}
 		}
-
 		return true;
 	}
 
-	public function tryCreatingPortal(BlockTransaction $transaction, Vector3 $frame_block_pos) : bool{
-		$added = 0;
-		for($i = 0; $i < 4; ++$i){
-			for($j = -1; $j <= 1; ++$j){
-				$center = $frame_block_pos->getSide(self::SIDES[$i], 2)->getSide(self::SIDES[($i + 1) % 4], $j);
-				if($this->isCompletedPortal($transaction, $center)){
-					$this->createPortal($transaction, $center);
-					$added++;
-				}
-			}
-		}
-		return $added > 0;
-	}
-
 	public function createPortal(BlockTransaction $transaction, Vector3 $center) : void{
+		$type_id = $this->portal_block->getTypeId();
 		for($i = -1; $i <= 1; ++$i){
 			for($j = -1; $j <= 1; ++$j){
-				$transaction->addBlockAt($center->x + $i, $center->y, $center->z + $j, $this->portal_block);
-			}
-		}
-	}
-
-	public function tryDestroyingPortal(BlockTransaction $transaction, Vector3 $frame_block_pos) : bool{
-		for($i = 0; $i < 4; ++$i){
-			for($j = -1; $j <= 1; ++$j){
-				$center = $frame_block_pos->getSide(self::SIDES[$i], 2)->getSide(self::SIDES[($i + 1) % 4], $j);
-				if(!$this->isCompletedPortal($transaction, $center)){
-					$this->destroyPortal($transaction, $frame_block_pos);
-					return true;
+				if($transaction->fetchBlockAt($center->x + $i, $center->y, $center->z + $j) !== $type_id){
+					$transaction->addBlockAt($center->x + $i, $center->y, $center->z + $j, $this->portal_block);
 				}
 			}
 		}
-		return false;
 	}
 
 	public function destroyPortal(BlockTransaction $transaction, Vector3 $center) : void{

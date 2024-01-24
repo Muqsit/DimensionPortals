@@ -47,8 +47,10 @@ final class ExoBlockFactory{
 	}
 
 	private static function initEnd(EndConfiguration $config) : void{
-		self::register(new EndPortalFrameExoBlock(ExtraVanillaBlocks::END_PORTAL(), ExtraVanillaItems::ENDER_EYE()), VanillaBlocks::END_PORTAL_FRAME());
-		self::register(new EndPortalExoBlock($config->teleportation_duration), ExtraVanillaBlocks::END_PORTAL());
+		$frame_block = VanillaBlocks::END_PORTAL_FRAME();
+		$portal_block = ExtraVanillaBlocks::END_PORTAL();
+		self::register(new EndPortalFrameExoBlock($portal_block, ExtraVanillaItems::ENDER_EYE()), $frame_block);
+		self::register(new EndPortalExoBlock($config->teleportation_duration, $frame_block, $portal_block), $portal_block);
 	}
 
 	public static function register(ExoBlock $exo_block, Block $block) : void{

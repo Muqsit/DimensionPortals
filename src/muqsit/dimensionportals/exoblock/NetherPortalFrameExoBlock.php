@@ -8,6 +8,7 @@ use muqsit\dimensionportals\event\player\PlayerCreateNetherPortalEvent;
 use muqsit\dimensionportals\utils\ArrayUtils;
 use pocketmine\block\Block;
 use pocketmine\block\BlockTypeIds;
+use pocketmine\block\NetherPortal;
 use pocketmine\item\Item;
 use pocketmine\item\ItemTypeIds;
 use pocketmine\math\Facing;
@@ -22,10 +23,10 @@ use function count;
 class NetherPortalFrameExoBlock implements ExoBlock{
 
 	readonly private int $frame_block_id;
-	readonly private Block $portal_block;
+	readonly private NetherPortal $portal_block;
 	readonly private float $length_squared;
 
-	public function __construct(Block $frame_block, Block $portal_block, int $max_portal_height, int $max_portal_width){
+	public function __construct(Block $frame_block, NetherPortal $portal_block, int $max_portal_height, int $max_portal_width){
 		$this->frame_block_id = $frame_block->getTypeId();
 		$this->portal_block = $portal_block;
 		$this->length_squared = (new Vector2($max_portal_height, $max_portal_width))->lengthSquared();
@@ -63,7 +64,7 @@ class NetherPortalFrameExoBlock implements ExoBlock{
 	/**
 	 * @param World $world
 	 * @param Vector3 $origin
-	 * @param Facing::* $direction
+	 * @param value-of<Facing::HORIZONTAL> $direction
 	 * @return BlockTransaction|null
 	 */
 	public function fill(World $world, Vector3 $origin, int $direction) : ?BlockTransaction{
