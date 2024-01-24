@@ -46,7 +46,7 @@ class NetherPortalExoBlock extends PortalExoBlock{
 		if($pos->y < World::Y_MAX - 1){
 			$shouldKeep &= $this->isValid($world->getBlockAt($pos->x, $pos->y + 1, $pos->z));
 		}
-		if($pos->y > 0){
+		if($pos->y > World::Y_MIN){
 			$shouldKeep &= $this->isValid($world->getBlockAt($pos->x, $pos->y - 1, $pos->z));
 		}
 
