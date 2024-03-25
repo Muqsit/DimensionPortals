@@ -39,7 +39,7 @@ final class PlayerInstance{
 	public function onEnterPortal(PortalExoBlock $block, Position $position) : void{
 		($ev = new PlayerEnterPortalEvent($this->player, $block, $position, $this->player->isCreative() ? 0 : $block->teleportation_duration))->call();
 		if(!$ev->isCancelled()){
-			$this->in_portal = new PlayerPortalInfo($block, $ev->teleport_duration);
+			$this->in_portal = new PlayerPortalInfo($block, $position, $ev->teleport_duration);
 			PlayerManager::scheduleTicking($this->player);
 		}
 	}
@@ -91,7 +91,7 @@ final class PlayerInstance{
 		$to = $this->in_portal->block->getTargetWorldInstance();
 		$world = (WorldManager::get($this->player->getWorld()) === $to ? WorldManager::getOverworld() : $to)->world;
 		$target = Location::fromObject($world->getSpawnLocation(), $world, 0.0, 0.0);
-		($ev = new PlayerPortalTeleportEvent($this->player, $this->in_portal->block, $target))->call();
+		($ev = new PlayerPortalTeleportEvent($this->player, $this->in_portal->block, $this->in_portal->block_position, $target))->call();
 		if(!$ev->isCancelled()){
 			$this->player->teleport($ev->target);
 		}

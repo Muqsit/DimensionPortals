@@ -10,6 +10,7 @@ use pocketmine\entity\Location;
 use pocketmine\event\Cancellable;
 use pocketmine\event\CancellableTrait;
 use pocketmine\player\Player;
+use pocketmine\world\Position;
 
 class PlayerPortalTeleportEvent extends DimensionPortalsEvent implements Cancellable{
 	use CancellableTrait;
@@ -17,6 +18,7 @@ class PlayerPortalTeleportEvent extends DimensionPortalsEvent implements Cancell
 	public function __construct(
 		readonly public Player $player,
 		readonly public PortalExoBlock $block,
+		readonly public Position $block_position,
 		public Location $target
 	){}
 
