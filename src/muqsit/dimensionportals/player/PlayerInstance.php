@@ -57,7 +57,7 @@ final class PlayerInstance{
 		if($this->chunks_per_tick_before_change < 40){
 			$this->_chunksPerTick->setValue($this->player, 40);
 		}
-		$session->sendDataPacket(ChangeDimensionPacket::create($network_dimension_id, $position, $respawn));
+		$session->sendDataPacket(ChangeDimensionPacket::create($network_dimension_id, $position, $respawn, null));
 		PlayerManager::$_queue_fast_dimension_change_request[$id = $this->player->getId()] = $id;
 		$this->logger->debug("Started changing dimension (network_dimension_id: {$network_dimension_id}, position: {$position->asVector3()}, respawn: " . ($respawn ? "true" : "false") . ")");
 	}
