@@ -7,11 +7,20 @@ namespace muqsit\dimensionportals;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
+use pocketmine\network\mcpe\protocol\types\DimensionIds;
 use pocketmine\world\BlockTransaction;
 use pocketmine\world\World;
 use SplQueue;
 
 final class Utils{
+
+	public static function coreDimensionToNetwork(int $dimension) : int{
+		return match($dimension){
+			WorldManager::TYPE_OVERWORLD => DimensionIds::OVERWORLD,
+			WorldManager::TYPE_NETHER => DimensionIds::NETHER,
+			WorldManager::TYPE_END => DimensionIds::THE_END
+		};
+	}
 
 	/**
 	 * @param World $world

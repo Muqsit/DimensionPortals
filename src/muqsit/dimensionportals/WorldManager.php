@@ -8,7 +8,6 @@ use muqsit\dimensionfix\Loader as DimensionFixLoader;
 use pocketmine\event\EventPriority;
 use pocketmine\event\world\WorldLoadEvent;
 use pocketmine\event\world\WorldUnloadEvent;
-use pocketmine\network\mcpe\protocol\types\DimensionIds;
 use pocketmine\world\World;
 use function gettype;
 use function is_array;
@@ -94,11 +93,7 @@ final class WorldManager{
 	public function doWorldLoad(World $world) : void{
 		$name = $world->getFolderName();
 		if($this->dimension_fix !== null && isset($this->world_dimensions[$name])){
-			$this->dimension_fix->applyToWorld($name, match($this->world_dimensions[$name]){
-				self::TYPE_OVERWORLD => DimensionIds::OVERWORLD,
-				self::TYPE_NETHER => DimensionIds::NETHER,
-				self::TYPE_END => DimensionIds::THE_END
-			});
+			$this->dimension_fix->applyToWorld($name, Utils::coreDimensionToNetwork($this->world_dimensions[$name]));
 		}
 	}
 
