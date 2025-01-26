@@ -8,10 +8,13 @@ worlds:
   nether: nether
   end: end
 
+# This dimension is set to all worlds not defined in 'worlds' above.
+default-dimension: overworld
+
+# Define the default dimension worlds for each world.
+# When players use portals, they will be teleported to one of these
+# worlds.
 default-worlds:
-  # Define the default dimension worlds for each world.
-  # When players use portals, they will be teleported to one of these
-  # worlds.
   overworld: world
   nether: nether
   end: end
