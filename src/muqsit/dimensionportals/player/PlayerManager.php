@@ -6,7 +6,7 @@ namespace muqsit\dimensionportals\player;
 
 use Logger;
 use muqsit\dimensionportals\Loader;
-use muqsit\dimensionportals\world\WorldManager;
+use muqsit\dimensionportals\WorldManager;
 use muqsit\simplepackethandler\SimplePacketHandler;
 use pocketmine\network\mcpe\NetworkSession;
 use pocketmine\network\mcpe\protocol\MovePlayerPacket;

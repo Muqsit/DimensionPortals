@@ -8,7 +8,7 @@ use Logger;
 use muqsit\dimensionportals\event\player\PlayerEnterPortalEvent;
 use muqsit\dimensionportals\event\player\PlayerPortalTeleportEvent;
 use muqsit\dimensionportals\exoblock\PortalExoBlock;
-use muqsit\dimensionportals\world\WorldManager;
+use muqsit\dimensionportals\WorldManager;
 use pocketmine\entity\Location;
 use pocketmine\math\Vector3;
 use pocketmine\network\mcpe\protocol\ChangeDimensionPacket;

@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace muqsit\dimensionportals\exoblock;
 
-use muqsit\dimensionportals\world\WorldInstance;
-use muqsit\dimensionportals\world\WorldManager;
-use muqsit\dimensionportals\world\WorldUtils;
+use muqsit\dimensionportals\Utils;
+use muqsit\dimensionportals\WorldManager;
 use pocketmine\block\Block;
 use pocketmine\block\NetherPortal;
 use pocketmine\item\Item;
@@ -80,7 +79,7 @@ class NetherPortalExoBlock extends PortalExoBlock{
 				$check_sides[] = Facing::NORTH;
 				$check_sides[] = Facing::SOUTH;
 			}
-			return WorldUtils::removeTouchingBlocks($world, $this->portal_block_id, $pos, $check_sides)?->apply() ?? false;
+			return Utils::removeTouchingBlocks($world, $this->portal_block_id, $pos, $check_sides)?->apply() ?? false;
 		}
 		return false;
 	}

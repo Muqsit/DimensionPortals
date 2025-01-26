@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace muqsit\dimensionportals\exoblock;
 
-use muqsit\dimensionportals\world\WorldInstance;
-use muqsit\dimensionportals\world\WorldManager;
-use muqsit\dimensionportals\world\WorldUtils;
+use muqsit\dimensionportals\Utils;
+use muqsit\dimensionportals\WorldManager;
 use pocketmine\block\Block;
 use pocketmine\item\Item;
 use pocketmine\math\Facing;
@@ -47,7 +46,7 @@ class EndPortalExoBlock extends PortalExoBlock{
 	public function update(Block $wrapping) : bool{
 		$pos = $wrapping->getPosition();
 		if(!$this->meetsSupportConditions(new BlockTransaction($pos->getWorld()), $pos)){
-			WorldUtils::removeTouchingBlocks($pos->getWorld(), $this->portal_block_id, $pos, Facing::HORIZONTAL)?->apply();
+			Utils::removeTouchingBlocks($pos->getWorld(), $this->portal_block_id, $pos, Facing::HORIZONTAL)?->apply();
 		}
 		return false;
 	}

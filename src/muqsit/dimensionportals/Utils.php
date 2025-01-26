@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace muqsit\dimensionportals\world;
+namespace muqsit\dimensionportals;
 
 use pocketmine\block\VanillaBlocks;
 use pocketmine\math\Facing;
@@ -11,7 +11,7 @@ use pocketmine\world\BlockTransaction;
 use pocketmine\world\World;
 use SplQueue;
 
-final class WorldUtils{
+final class Utils{
 
 	/**
 	 * @param World $world

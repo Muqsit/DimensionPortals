@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace muqsit\dimensionportals\config;
+namespace muqsit\dimensionportals;
 
 use RuntimeException;
 
