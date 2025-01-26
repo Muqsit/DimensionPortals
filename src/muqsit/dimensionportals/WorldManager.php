@@ -9,6 +9,7 @@ use pocketmine\event\EventPriority;
 use pocketmine\event\world\WorldLoadEvent;
 use pocketmine\event\world\WorldUnloadEvent;
 use pocketmine\world\World;
+use pocketmine\world\WorldManager as PmWorldManager;
 use function gettype;
 use function is_array;
 use function is_string;
@@ -18,6 +19,8 @@ final class WorldManager{
 	public const int TYPE_OVERWORLD = 0;
 	public const int TYPE_NETHER = 1;
 	public const int TYPE_END = 2;
+
+	readonly public PmWorldManager $server_manager;
 
 	/** @var self::TYPE_* */
 	public int $default_dimension;
@@ -31,6 +34,7 @@ final class WorldManager{
 	private ?DimensionFixLoader $dimension_fix;
 
 	public function __construct(Loader $plugin){
+		$this->server_manager = $plugin->getServer()->getWorldManager();
 		$config = $plugin->getConfig();
 
 		$dimension = $config->get("default-dimension");
@@ -85,7 +89,7 @@ final class WorldManager{
 		$manager->registerEvent(WorldUnloadEvent::class, function(WorldUnloadEvent $event) : void{
 			$this->doWorldUnload($event->getWorld());
 		}, EventPriority::MONITOR, $plugin);
-		foreach($plugin->getServer()->getWorldManager()->getWorlds() as $world){
+		foreach($this->server_manager->getWorlds() as $world){
 			$this->doWorldLoad($world);
 		}
 	}
