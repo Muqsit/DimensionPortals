@@ -12,10 +12,12 @@ use RuntimeException;
 
 final class Loader extends PluginBase{
 
+	private PlayerManager $player_manager;
 	private WorldManager $world_manager;
 
 	protected function onLoad() : void{
 		try{
+			$this->player_manager = new PlayerManager();
 			$this->world_manager = new WorldManager($this);
 		}catch(BadConfigurationException $e){
 			$this->getLogger()->warning("The plugin failed to load due to bad configuration.");
@@ -27,8 +29,13 @@ final class Loader extends PluginBase{
 	}
 
 	protected function onEnable() : void{
+		$this->world_manager->init($this);
+		$this->player_manager->init($this);
 		ExoBlockFactory::init($this);
-		PlayerManager::init($this);
+	}
+
+	public function getPlayerManager() : PlayerManager{
+		return $this->player_manager;
 	}
 
 	public function getWorldManager() : WorldManager{
