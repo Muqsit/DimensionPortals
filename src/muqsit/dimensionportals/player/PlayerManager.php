@@ -60,7 +60,7 @@ final class PlayerManager{
 		});
 
 		SimplePacketHandler::createMonitor($plugin)->monitorIncoming(static function(PlayerActionPacket $packet, NetworkSession $origin) : void{
-			if($packet->action === PlayerAction::DIMENSION_CHANGE_ACK){
+			if($packet->action === PlayerAction::DIMENSION_CHANGE_ACK && isset(self::$_changing_dimension_sessions[spl_object_id($origin)])){
 				$player = $origin->getPlayer();
 				if($player !== null && $player->isConnected()){
 					PlayerManager::get($player)->onEndDimensionChange();
