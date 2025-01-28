@@ -12,8 +12,9 @@ As of Minecraft Bedrock Edition v1.19.0, the following plugin(s) **are required*
 
 ## Features
 - **Multiple worlds supported**: Have a `nether` world? Have a `nether2` as well? No worries, configure them both as nether.
-- **Extremely fast loading screen**: Do not keep players waiting longer than they need to!
+- **Extremely fast loading screen**: Do not keep players waiting longer than they need to with near-instantaneous dimension switches!
 
+  https://github.com/user-attachments/assets/bdd78461-6a63-4b6b-bbce-6914c70ef7ed
 ## Developer Documentation
 
 ### Check if a player is on dimension change screen
