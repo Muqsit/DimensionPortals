@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace muqsit\dimensionportals\player;
 
-use muqsit\dimensionportals\exoblock\PortalExoBlock;
+use muqsit\dimensionportals\WorldManager;
 use pocketmine\world\Position;
 
 final class PlayerPortalInfo{
 
 	private int $duration = 0;
 
+	/**
+	 * @param WorldManager::DIMENSION_* $dimension
+	 * @param Position $block_position
+	 * @param int $max_duration
+	 */
 	public function __construct(
-		readonly public PortalExoBlock $block,
+		readonly public int $dimension,
 		readonly public Position $block_position,
 		readonly public int $max_duration
 	){}

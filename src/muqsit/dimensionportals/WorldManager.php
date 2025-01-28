@@ -16,32 +16,31 @@ use function is_string;
 
 final class WorldManager{
 
-	public const int TYPE_OVERWORLD = 0;
-	public const int TYPE_NETHER = 1;
-	public const int TYPE_END = 2;
+	public const int DIMENSION_OVERWORLD = 0;
+	public const int DIMENSION_NETHER = 1;
+	public const int DIMENSION_END = 2;
 
 	readonly public PmWorldManager $server_manager;
 
-	/** @var self::TYPE_* */
+	/** @var self::DIMENSION_* */
 	public int $default_dimension;
 
-	/** @var array<string, self::TYPE_*> */
+	/** @var array<string, self::DIMENSION_*> */
 	public array $world_dimensions;
 
-	/** @var array<self::TYPE_*, string|null> */
+	/** @var array<self::DIMENSION_*, string|null> */
 	public array $default_worlds;
 
 	private ?DimensionFixLoader $dimension_fix;
 
 	public function __construct(Loader $plugin){
-		$this->server_manager = $plugin->getServer()->getWorldManager();
 		$config = $plugin->getConfig();
 
 		$dimension = $config->get("default-dimension");
 		$default_dimension = match($dimension){
-			"overworld" => self::TYPE_OVERWORLD,
-			"nether" => self::TYPE_NETHER,
-			"end" => self::TYPE_END,
+			"overworld" => self::DIMENSION_OVERWORLD,
+			"nether" => self::DIMENSION_NETHER,
+			"end" => self::DIMENSION_END,
 			default => throw new BadConfigurationException("default-dimension: unexpected dimension type '{$dimension}', expected one of: overworld, nether, end")
 		};
 
@@ -49,32 +48,34 @@ final class WorldManager{
 		$worlds = $config->get("worlds");
 		is_array($worlds) || throw new BadConfigurationException("'worlds' must be an array, got " . gettype($worlds));
 		foreach($worlds as $world_folder_name => $dimension_type){
-			$this->world_dimensions[(string) $world_folder_name] = match($dimension_type){
-				"overworld" => self::TYPE_OVERWORLD,
-				"nether" => self::TYPE_NETHER,
-				"end" => self::TYPE_END,
+			$world_dimensions[(string) $world_folder_name] = match($dimension_type){
+				"overworld" => self::DIMENSION_OVERWORLD,
+				"nether" => self::DIMENSION_NETHER,
+				"end" => self::DIMENSION_END,
 				default => throw new BadConfigurationException("worlds: unexpected dimension type '{$dimension_type}', expected one of: overworld, nether, end")
 			};
 		}
 
 		$default_worlds = [
-			self::TYPE_OVERWORLD => null,
-			self::TYPE_NETHER => null,
-			self::TYPE_END => null
+			self::DIMENSION_OVERWORLD => null,
+			self::DIMENSION_NETHER => null,
+			self::DIMENSION_END => null
 		];
 		$worlds = $config->get("default-worlds");
 		is_array($worlds) || throw new BadConfigurationException("'default-worlds' must be an array, got " . gettype($worlds));
 		foreach($worlds as $dimension_type => $world_folder_name){
 			$dimension_id = match($dimension_type){
-				"overworld" => self::TYPE_OVERWORLD,
-				"nether" => self::TYPE_NETHER,
-				"end" => self::TYPE_END,
+				"overworld" => self::DIMENSION_OVERWORLD,
+				"nether" => self::DIMENSION_NETHER,
+				"end" => self::DIMENSION_END,
 				default => throw new BadConfigurationException("default-worlds: unexpected dimension type '{$dimension_type}', expected one of: overworld, nether, end")
 			};
 			is_string($world_folder_name) || throw new BadConfigurationException("default-worlds-{$dimension_type}: world name must be string, got " . gettype($world_folder_name));
 			$default_worlds[$dimension_id] = $world_folder_name;
+			$world_dimensions[$world_folder_name] = $dimension_id;
 		}
 
+		$this->server_manager = $plugin->getServer()->getWorldManager();
 		$this->default_dimension = $default_dimension;
 		$this->world_dimensions = $world_dimensions;
 		$this->default_worlds = $default_worlds;

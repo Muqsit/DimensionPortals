@@ -19,16 +19,17 @@ default-worlds:
   nether: nether
   end: end
 
-# The number of ticks the player must wait in portal
-# before they get teleported to the nether.
-nether-teleportation-duration: 80
 nether-portal:
+  # The number of ticks the player must wait in portal
+  # before they get teleported to the nether.
+  teleportation-duration: 80
   # Frame block for the portal
-  frame-block: OBSIDIAN
+  frame-block: obsidian
   # Dimensions of the portal
   max-width: 30
   max-height: 30
 
-# The number of ticks the player must wait in portal
-# before they get teleported to the end.
-end-teleportation-duration: 0
+end-portal:
+  # The number of ticks the player must wait in portal
+  # before they get teleported to the end.
+  teleportation-duration: 0

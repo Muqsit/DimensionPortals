@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace muqsit\dimensionportals;
 
-use muqsit\dimensionportals\exoblock\ExoBlockFactory;
+use muqsit\dimensionportals\exoblock\BlockManager;
 use muqsit\dimensionportals\player\PlayerManager;
 use muqsit\dimensionportals\vanilla\ExtraVanillaData;
 use pocketmine\plugin\PluginBase;
@@ -12,11 +12,13 @@ use RuntimeException;
 
 final class Loader extends PluginBase{
 
+	private BlockManager $block_manager;
 	private PlayerManager $player_manager;
 	private WorldManager $world_manager;
 
 	protected function onLoad() : void{
 		try{
+			$this->block_manager = new BlockManager($this);
 			$this->player_manager = new PlayerManager();
 			$this->world_manager = new WorldManager($this);
 		}catch(BadConfigurationException $e){
@@ -29,9 +31,13 @@ final class Loader extends PluginBase{
 	}
 
 	protected function onEnable() : void{
+		$this->block_manager->init($this);
 		$this->world_manager->init($this);
 		$this->player_manager->init($this);
-		ExoBlockFactory::init($this);
+	}
+
+	public function getBlockManager() : BlockManager{
+		return $this->block_manager;
 	}
 
 	public function getPlayerManager() : PlayerManager{
@@ -40,8 +46,5 @@ final class Loader extends PluginBase{
 
 	public function getWorldManager() : WorldManager{
 		return $this->world_manager;
-	}
-
-	public function getConfiguration() : {
 	}
 }

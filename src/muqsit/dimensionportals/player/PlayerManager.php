@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace muqsit\dimensionportals\player;
 
-use Logger;
 use muqsit\dimensionportals\Loader;
 use muqsit\dimensionportals\Utils;
 use muqsit\simplepackethandler\SimplePacketHandler;
@@ -50,9 +49,11 @@ final class PlayerManager{
 	public function init(Loader $plugin) : void{
 		$logger = $plugin->getLogger();
 		$manager = $plugin->getServer()->getPluginManager();
-		$manager->registerEvent(PlayerLoginEvent::class, function(PlayerLoginEvent $event) use($logger) : void{
+		$block_manager = $plugin->getBlockManager();
+		$world_manager = $plugin->getWorldManager();
+		$manager->registerEvent(PlayerLoginEvent::class, function(PlayerLoginEvent $event) use($logger, $block_manager, $world_manager) : void{
 			$player = $event->getPlayer();
-			$this->create($player, new PrefixedLogger($logger, $player->getName()));
+			$this->players[$player->getId()] = new PlayerInstance($this, $block_manager, $world_manager, $player, new PrefixedLogger($logger, $player->getName()));
 		}, EventPriority::MONITOR, $plugin);
 		$manager->registerEvent(PlayerQuitEvent::class, function(PlayerQuitEvent $event) : void{
 			$this->destroy($event->getPlayer());
@@ -87,11 +88,16 @@ final class PlayerManager{
 			return !isset($this->_changing_dimension_sessions[spl_object_id($origin)]);
 		});
 		SimplePacketHandler::createMonitor($plugin)->monitorIncoming(function(PlayerActionPacket $packet, NetworkSession $origin) : void{
-			if($packet->action === PlayerAction::DIMENSION_CHANGE_ACK && isset($this->_changing_dimension_sessions[spl_object_id($origin)])){
-				$player = $origin->getPlayer();
-				if($player !== null && $player->isConnected()){
-					PlayerManager::get($player)->onEndDimensionChange();
-				}
+			if($packet->action !== PlayerAction::DIMENSION_CHANGE_ACK){
+				return;
+			}
+			$player = $origin->getPlayer();
+			if($player === null || !$player->isConnected()){
+				return;
+			}
+			$instance = $this->get($player);
+			if($instance->getChangingDimension() !== null){
+				$instance->onEndDimensionChange();
 			}
 		});
 		$plugin->getScheduler()->scheduleRepeatingTask(new ClosureTask(function() : void{
@@ -112,7 +118,7 @@ final class PlayerManager{
 	private function registerLockPlayerHandlers(Loader $plugin) : void{
 		$is_changing_dimension = function(Player $player) : bool{
 			$instance = $this->getNullable($player);
-			return $instance !== null && $instance->isChangingDimension();
+			return $instance !== null && $instance->getChangingDimension() !== null;
 		};
 		$manager = $plugin->getServer()->getPluginManager();
 		$manager->registerEvent(EntityDamageEvent::class, function(EntityDamageEvent $event) use($is_changing_dimension) : void{
@@ -153,10 +159,6 @@ final class PlayerManager{
 				$event->cancel();
 			}
 		}, EventPriority::LOW, $plugin);
-	}
-
-	public function create(Player $player, Logger $logger) : void{
-		$this->players[$player->getId()] = new PlayerInstance($player, $logger);
 	}
 
 	public function destroy(Player $player) : void{

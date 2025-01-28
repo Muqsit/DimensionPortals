@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace muqsit\dimensionportals;
 
+use InvalidArgumentException;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\math\Facing;
 use pocketmine\math\Vector3;
@@ -16,9 +17,10 @@ final class Utils{
 
 	public static function coreDimensionToNetwork(int $dimension) : int{
 		return match($dimension){
-			WorldManager::TYPE_OVERWORLD => DimensionIds::OVERWORLD,
-			WorldManager::TYPE_NETHER => DimensionIds::NETHER,
-			WorldManager::TYPE_END => DimensionIds::THE_END
+			WorldManager::DIMENSION_OVERWORLD => DimensionIds::OVERWORLD,
+			WorldManager::DIMENSION_NETHER => DimensionIds::NETHER,
+			WorldManager::DIMENSION_END => DimensionIds::THE_END,
+			default => throw new InvalidArgumentException("Unexpected core dimension ID: {$dimension}")
 		};
 	}
 
