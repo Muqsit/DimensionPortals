@@ -10,8 +10,8 @@ use pocketmine\player\Player;
 
 final class PlayerDimensionScreenChangeEvent extends PlayerEvent{
 
-	public const int STATE_BEGIN = 0;
-	public const int STATE_END = 1;
+	public const STATE_BEGIN = 0;
+	public const STATE_END = 1;
 
 	/**
 	 * @param Player $player

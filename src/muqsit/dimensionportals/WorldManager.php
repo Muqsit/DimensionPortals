@@ -16,9 +16,9 @@ use function is_string;
 
 final class WorldManager{
 
-	public const int DIMENSION_OVERWORLD = 0;
-	public const int DIMENSION_NETHER = 1;
-	public const int DIMENSION_END = 2;
+	public const DIMENSION_OVERWORLD = 0;
+	public const DIMENSION_NETHER = 1;
+	public const DIMENSION_END = 2;
 
 	readonly public PmWorldManager $server_manager;
 
