@@ -111,12 +111,9 @@ final class PlayerInstance{
 		$target_dimension = $current_dimension === $portal_dimension ? WorldManager::DIMENSION_OVERWORLD : $portal_dimension;
 		$target_world_name = $this->world_manager->default_worlds[$target_dimension];
 		$world = $target_world_name !== null ? $this->world_manager->server_manager->getWorldByName($target_world_name) : null;
-		if($world === null){
-			return;
-		}
-		$target = Location::fromObject($world->getSpawnLocation(), $world, 0.0, 0.0);
+		$target = $world !== null ? Location::fromObject($world->getSpawnLocation(), $world, 0.0, 0.0) : $this->player->getLocation();
 		($ev = new PlayerPortalTeleportEvent($this->player, $portal_dimension, $this->in_portal->block_position, $target))->call();
-		if($ev->isCancelled()){
+		if($ev->isCancelled() || ($world === null && $ev->target === $target)){
 			return;
 		}
 		$this->player->teleport($ev->target);
